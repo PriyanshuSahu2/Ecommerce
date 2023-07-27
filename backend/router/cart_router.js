@@ -10,7 +10,7 @@ const {
 const CartModel = mongoose.model("CartModel");
 const ProductModel = mongoose.model("ProductModel");
 
-router.post("/add", verifyTokenAndAuth, async (req, res) => {
+router.post("/add", verifyToken, async (req, res) => {
   const { products } = req.body;
   const userId = req.user.id;
   CartModel.findOne({ userId })
@@ -26,7 +26,11 @@ router.post("/add", verifyTokenAndAuth, async (req, res) => {
               .then((product) => {
                 const cartId = newCart.products[0]._id;
                 res.status(201).json({
-                  product: { ...product._doc, ...req.body.products[0],cartId:cartId },
+                  product: {
+                    ...product._doc,
+                    ...req.body.products[0],
+                    cartId: cartId,
+                  },
                 });
               })
               .catch((err) => {
@@ -46,9 +50,8 @@ router.post("/add", verifyTokenAndAuth, async (req, res) => {
           .then(() => {
             ProductModel.findById(`${req.body.products[0].productId}`)
               .then((product) => {
-            
                 const cartId = cart.products[cart.products.length - 1]._id;
-                console.log(cartId)
+                console.log(cartId);
                 res.status(200).json({
                   products: {
                     ...product._doc,
@@ -74,7 +77,7 @@ router.post("/add", verifyTokenAndAuth, async (req, res) => {
     });
 });
 
-router.get("/", verifyTokenAndAuth, async (req, res) => {
+router.get("/", verifyToken, async (req, res) => {
   const { id } = req.user;
   try {
     const cart = await CartModel.findOne({ userId: id });
@@ -96,8 +99,9 @@ router.get("/", verifyTokenAndAuth, async (req, res) => {
         if (!productData) {
           // Product with the provided ID does not exist
           return null;
+          res.status(200).json({message:"Product not found"});
         }
-
+        console.log(productData);
         const { _id } = product;
         return { ...productData._doc, selectedSize, quantity, cartId: _id };
       })
@@ -153,7 +157,7 @@ router.delete("/delete/:id", verifyTokenAndAuth, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-router.put("/update/:id", verifyTokenAndAuth, async (req, res) => {
+router.put("/update/:id", verifyToken, async (req, res) => {
   const { id } = req.params; // Get the cart item ID from the request parameters
   const { id: userId } = req.user; // Get the user ID from the authenticated user
 
@@ -177,7 +181,6 @@ router.put("/update/:id", verifyTokenAndAuth, async (req, res) => {
       // Cart item with the provided ID does not exist
       return res.status(404).json({ message: "Cart item not found" });
     }
-
 
     cartProducts[itemIndex].quantity = req.body.quantity;
     cartProducts[itemIndex].selectedSize = req.body.selectedSize;
