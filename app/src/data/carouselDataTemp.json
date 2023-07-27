@@ -1,0 +1,19 @@
+{
+    "slides":[
+        {
+            "src":"https://picsum.photos/seed/img2/1920/400",
+            "alt":"img1",
+            "redirect":"https://picsum.photos/seed/img2/1920/400"
+        },
+        {
+            "src":"https://picsum.photos/seed/img5/1920/400",
+            "alt":"img2",
+            "redirect":"https://picsum.photos/seed/img2/1920/400"
+        },
+        {
+            "src":"https://picsum.photos/seed/img1/1920/400",
+            "alt":"img3",
+            "redirect":"https://picsum.photos/seed/img2/1920/400"
+        }
+    ]
+}

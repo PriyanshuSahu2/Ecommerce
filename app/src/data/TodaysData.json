@@ -1,0 +1,56 @@
+{
+    "Deals":[
+        {
+            "Title":"DEALS Of THe Day",
+            "Deal":[
+                {
+                    "src":"https://picsum.photos/seed/img1/200/250",
+                    "alt":"img1",
+                    "redirect":"https://picsum.photos/seed/img2/1920/400"
+                },
+                {
+                    "src":"https://picsum.photos/seed/img2/200/250",
+                    "alt":"img1",
+                    "redirect":"https://picsum.photos/seed/img2/1920/400"
+                },
+                {
+                    "src":"https://picsum.photos/seed/img4/200/250",
+                    "alt":"img1",
+                    "redirect":"https://picsum.photos/seed/img2/1920/400"
+                },
+                {
+                    "src":"https://picsum.photos/seed/img3/200/250",
+                    "alt":"img1",
+                    "redirect":"https://picsum.photos/seed/img2/1920/400"
+                }
+
+            ]
+        },
+        {
+            "Title":"KA ME HA ME HA DEALS",
+            "Deal":[
+                {
+                    "src":"https://picsum.photos/seed/img6/200/250",
+                    "alt":"img1",
+                    "redirect":"https://picsum.photos/seed/img2/1920/400"
+                },
+                {
+                    "src":"https://picsum.photos/seed/img7/200/250",
+                    "alt":"img1",
+                    "redirect":"https://picsum.photos/seed/img2/1920/400"
+                },
+                {
+                    "src":"https://picsum.photos/seed/img8/200/250",
+                    "alt":"img1",
+                    "redirect":"https://picsum.photos/seed/img2/1920/400"
+                },
+                {
+                    "src":"https://picsum.photos/seed/img9/200/250",
+                    "alt":"img1",
+                    "redirect":"https://picsum.photos/seed/img2/1920/400"
+                }
+
+            ]
+        }
+    ]
+}
