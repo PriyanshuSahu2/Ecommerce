@@ -3,15 +3,15 @@ import { Container } from "react-bootstrap";
 import { styled } from "styled-components";
 import HeaderComponent from "../components/HeaderComponent";
 import Announcement from "../components/Announcement";
-import FooterComponent from "../components/FooterComponent";
 import { BsFillBagPlusFill } from "react-icons/bs";
-import { AiOutlineHeart } from "react-icons/ai";
 import { addCartProduct } from "../redux/cartRedux";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
-import { publicRequest } from "../requestMethod";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { IMAGE_BASE_URL, publicRequest } from "../requestMethod";
 import { FiArrowRight } from "react-icons/fi";
 import ReviewComponents from "../components/ReviewComponents";
+import Swal from "sweetalert2";
+
 const Wrapper = styled.div`
   display: flex;
 `;
@@ -19,13 +19,14 @@ const Wrapper = styled.div`
 const ProductImageGridContainer = styled.div`
   float: left;
   width: 58%;
-
+  height: 100%;
   display: grid;
   grid-template-columns: auto auto;
 `;
 const ProductImagesContainer = styled.div`
   border: 1px solid #eaeaec;
   font-size: 30px;
+
   text-align: center;
 `;
 const ProductImage = styled.img`
@@ -58,7 +59,7 @@ const ProductTitle = styled.h1`
   margin-top: 0;
   margin-bottom: 0;
 `;
-const SellingPriceContianer = styled.div`
+const SellingPriceContainer = styled.div`
   color: #696e79;
   font-size: 14px;
   margin-top: 14px;
@@ -82,7 +83,7 @@ const Info = styled.span`
 const ProductSizeSelectContainer = styled.div`
   margin: 10px 0 24px;
 `;
-const SizeContianerHeader = styled.div`
+const SizeContainerHeader = styled.div`
   margin: 0 0 10px;
   position: relative;
   line-height: 1;
@@ -111,8 +112,8 @@ const SizeBtn = styled.button`
   text-align: center;
   cursor: pointer;
   margin: 0 5px;
-  background-color: ${(props) => (props.isselected ? "#ff3f6c" : "white")};
-  color: ${(props) => (props.isselected ? "white" : "#ff3f6c")};
+  background-color: ${(props) => (props.isSelected ? "#ff3f6c" : "white")};
+  color: ${(props) => (props.isSelected ? "white" : "#ff3f6c")};
   &:hover {
   }
 `;
@@ -177,22 +178,6 @@ const BtnLabel = styled.span`
   font-weight: 700;
   cursor: pointer;
 `;
-const WhishlistBtnContianer = styled(AddToBagBtn)`
-  background-color: white;
-  border: 1px solid #d4d5d9;
-  color: #282c3f;
-  flex: 2;
-  &:hover {
-    border: 1px solid #ff3e6c;
-  }
-`;
-const WhislistIcon = styled(AiOutlineHeart)`
-  background-position: -2283px -40px;
-  width: 22px;
-  height: 22px;
-  margin-right: 5px;
-`;
-
 const ProductDescriptionLabel = styled.h4`
   color: #282c3f;
   font-size: 16px;
@@ -209,39 +194,14 @@ const ProductDescriptionLabel = styled.h4`
 //   margin-top: 12px;
 //   width: 84%;
 // `;
-const ProductSpecifcationTableContainer = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-`;
-const SpecificationRow = styled.div`
-  position: relative;
-  border-bottom: 1px solid #eaeaec;
-  margin: 0 0 12px;
-  padding-bottom: 10px;
-  -ms-flex-preferred-size: 40%;
-  flex-basis: 40%;
-  margin-right: 10%;
-`;
-const SpecificationTitle = styled.div`
-  position: relative;
-  color: #7e818c;
-  font-size: 12px;
-  line-height: 1;
-  margin-bottom: 5px;
-`;
-const SpecficationValue = styled.div`
-  position: relative;
-  color: #282c3f;
-  font-size: 16px;
-  line-height: 1.2;
-`;
+
 const ProductPage = () => {
   const [selectedSize, setSelectedSize] = useState("S");
   const dispatch = useDispatch();
   const productId = useLocation().pathname.split("/")[2];
   const [product, setProduct] = useState([]);
-
+  const navigate = useNavigate();
+  const [update, setUpdate] = useState("");
   useEffect(() => {
     const getProduct = async () => {
       try {
@@ -253,7 +213,7 @@ const ProductPage = () => {
     };
 
     getProduct(); // Call the `getProducts` function
-  }, [productId]);
+  }, [productId, update]);
 
   const SelectedSize = (size) => {
     setSelectedSize(size);
@@ -261,22 +221,43 @@ const ProductPage = () => {
 
   const cartProducts = useSelector((state) => state.cart.products);
   const isProductInCart = cartProducts?.some((item) => {
-    return item._id === product._id && item.selectedSize === selectedSize;
+    return item?._id === product?._id && item?.selectedSize === selectedSize;
   });
-  const AddToCart = () => {
-    dispatch(
-      addCartProduct({
-        products: [
-          {
-            productId: `${product._id}`,
-            quantity: 1,
-            selectedSize: `${selectedSize}`,
-          },
-        ],
-      })
-    );
+
+  const currentUser = useSelector((state) => state?.user?.currentUser);
+  const AddToCart = async () => {
+    if (currentUser) {
+      dispatch(
+        addCartProduct({
+          products: [
+            {
+              productId: `${product._id}`,
+              quantity: 1,
+              selectedSize: `${selectedSize}`,
+            },
+          ],
+        })
+      ).then((data) => {
+        console.log(data);
+      });
+    } else {
+      Swal.fire({
+        icon: "question",
+        title: "Do you want to Login?",
+        text: "Please Login First to Continue!!",
+        iconColor: "#ff3f6c",
+        confirmButtonColor: "#ff3f6c",
+        cancelButtonColor: "black",
+        showCancelButton: true,
+        confirmButtonText: "Login",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/auth");
+        }
+      });
+    }
   };
-  console.log();
+
   return (
     <>
       <Announcement />
@@ -284,10 +265,10 @@ const ProductPage = () => {
       <Container>
         <Wrapper className="mt-5">
           <ProductImageGridContainer>
-            {product.img?.map((item, idx) => {
+            {product.img?.map((image, idx) => {
               return (
                 <ProductImagesContainer>
-                  <ProductImage src={item} />
+                  <ProductImage src={`${IMAGE_BASE_URL}/products/${image}`} />
                 </ProductImagesContainer>
               );
             })}
@@ -297,16 +278,16 @@ const ProductPage = () => {
             <ProductPriceInfo>
               <ProductBrandTitle>{product.brand}</ProductBrandTitle>
               <ProductTitle>{product.productName}</ProductTitle>
-              <SellingPriceContianer>
-                <Price>Rs. {product.price}</Price>
+              <SellingPriceContainer>
+                <Price>$ {product.price}</Price>
                 <Info>inclusive of all taxes</Info>
-              </SellingPriceContianer>
+              </SellingPriceContainer>
             </ProductPriceInfo>
 
             <ProductSizeSelectContainer>
-              <SizeContianerHeader>
+              <SizeContainerHeader>
                 <Header>SELECT SIZE </Header>
-              </SizeContianerHeader>
+              </SizeContainerHeader>
               <AllSizeButtonsContainer>
                 <SizeBtnContainer>
                   {product.sizes?.map((item, idx) => {
@@ -314,7 +295,7 @@ const ProductPage = () => {
 
                     return (
                       <SizeBtn
-                        isselected={isSelected}
+                        isSelected={isSelected}
                         key={idx}
                         onClick={() => {
                           SelectedSize(item);
@@ -341,11 +322,6 @@ const ProductPage = () => {
                     <BtnLabel>Go to Cart</BtnLabel>
                   </GoToBagBtn>
                 )}
-
-                <WhishlistBtnContianer>
-                  <WhislistIcon />
-                  <BtnLabel>Whislist</BtnLabel>
-                </WhishlistBtnContianer>
               </ProductActionsContainer>
             </div>
 
@@ -353,16 +329,17 @@ const ProductPage = () => {
 
             <>
               <ProductDescriptionLabel>PRODUCT DETAILS</ProductDescriptionLabel>
-
             </>
             <hr />
-            <ReviewComponents productId={productId} averageRating = {product?.rating}/>
+            <ReviewComponents
+              productId={productId}
+              averageRating={product?.rating}
+              setUpdate={setUpdate}
+              update={update}
+            />
           </ProductDescriptionContainer>
-
-          
         </Wrapper>
       </Container>
-      <FooterComponent />
     </>
   );
 };

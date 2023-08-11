@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import HeaderComponent from "../components/HeaderComponent";
-import FooterComponent from "../components/FooterComponent";
+
 import Login from "./Login";
 import Signup from "./Signup";
 
@@ -10,8 +10,6 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   width: auto;
-  justify-content: space-between;
-  background-color: pink;
   overflow: hidden;
 `;
 
@@ -43,7 +41,7 @@ const Wrapper = styled.div`
   padding: 20px;
   border-radius: 5px;
   width: 100vw;
-  height: 50vh;
+  height: 100vh;
   /* CSS transition for sliding animation */
   animation-duration: 0.3s;
   animation-timing-function: ease-in-out;
@@ -74,11 +72,13 @@ const AuthPage = () => {
         className={slideOut ? "slideOut" : "slideIn"}
         onAnimationEnd={() => setSlideOut(false)}
       >
-        {activeComponent === "login" ? <Login handleToggle={handleToggle}/> : <Signup />}
+        {activeComponent === "login" ? (
+          <Login handleToggle={handleToggle} />
+        ) : (
+          <Signup handleToggle={handleToggle} />
+        )}
         <hr />
-        
       </Wrapper>
-      <FooterComponent />
     </Container>
   );
 };

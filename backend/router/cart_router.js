@@ -18,7 +18,6 @@ router.post("/add", verifyToken, async (req, res) => {
       if (!cart) {
         // Cart does not exist for the user, create a new cart and add the product
         const newCart = new CartModel({ userId, ...req.body });
-
         newCart
           .save()
           .then(() => {
@@ -26,7 +25,7 @@ router.post("/add", verifyToken, async (req, res) => {
               .then((product) => {
                 const cartId = newCart.products[0]._id;
                 res.status(201).json({
-                  product: {
+                  products: {
                     ...product._doc,
                     ...req.body.products[0],
                     cartId: cartId,
@@ -99,7 +98,7 @@ router.get("/", verifyToken, async (req, res) => {
         if (!productData) {
           // Product with the provided ID does not exist
           return null;
-          res.status(200).json({message:"Product not found"});
+          res.status(200).json({ message: "Product not found" });
         }
         console.log(productData);
         const { _id } = product;
@@ -110,7 +109,7 @@ router.get("/", verifyToken, async (req, res) => {
     // Calculate the total price
 
     const totalPrice = productDetails.reduce(
-      (acc, product) => acc + product.price * product.quantity,
+      (acc, product) => acc + product?.price * product?.quantity,
       0
     );
     res.status(200).json({ products: productDetails, totalPrice });
@@ -120,7 +119,7 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-router.delete("/delete/:id", verifyTokenAndAuth, async (req, res) => {
+router.delete("/delete/:id", verifyToken, async (req, res) => {
   const { id } = req.params; // Get the cart item ID from the request parameters
   const { id: userId } = req.user; // Get the user ID from the authenticated user
 
@@ -157,6 +156,7 @@ router.delete("/delete/:id", verifyTokenAndAuth, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 router.put("/update/:id", verifyToken, async (req, res) => {
   const { id } = req.params; // Get the cart item ID from the request parameters
   const { id: userId } = req.user; // Get the user ID from the authenticated user
@@ -194,4 +194,19 @@ router.put("/update/:id", verifyToken, async (req, res) => {
   }
 });
 
+router.delete("/", verifyToken, async (req, res) => {
+  const { id } = req.user;
+  try {
+    const cart = await CartModel.findOne({ userId: id });
+    if (!cart) {
+      // Cart does not exist for the user
+      return res.status(404).json({ message: "Cart not found" });
+    }
+    await CartModel.deleteOne({ userId: id });
+    res.status(200).json({ message: "Cart deleted successfully" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 module.exports = router;

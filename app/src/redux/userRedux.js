@@ -1,14 +1,25 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { publicRequest } from "../requestMethod";
+import Swal from "sweetalert2";
 
 export const login = async (dispatch, user) => {
   console.log("LOGIN SKJSKO");
   dispatch(loginStart());
   try {
     const res = await publicRequest.post("/user/login", user);
+    await Swal.fire({
+      icon: "success",
+      title: "Login Successful",
+      text: res.data.message,
+    });
     dispatch(loginSuccess(res.data));
   } catch (err) {
+    await Swal.fire({
+      icon: "error",
+      title: "Login Failed",
+      text: err.response.data.error,
+    });
     dispatch(loginFailure());
   }
 };
@@ -32,8 +43,14 @@ const userSlice = createSlice({
       state.isFetching = false;
       state.error = true;
     },
+    logout: (state) => {
+      state.currentUser = null;
+      state.isFetching = false;
+      state.error = false;
+    },
   },
 });
 
-export const { loginStart, loginSuccess, loginFailure } = userSlice.actions;
+export const { loginStart, loginSuccess, loginFailure, logout } =
+  userSlice.actions;
 export default userSlice.reducer;

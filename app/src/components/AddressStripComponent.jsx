@@ -6,11 +6,11 @@ const AddressSectionContainer = styled.div`
   border-radius: 4px;
   border: 1px solid #eaeaec;
   margin-bottom: 8px;
-    background-color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
 `;
 const AddressTitle = styled.div`
   font-size: 14px;
@@ -36,12 +36,15 @@ const AddressSubText = styled.div`
   font-weight: 600;
 `;
 const AddressChangeBtn = styled.button`
-font-size: 12px;
+  font-size: 12px;
   line-height: inherit;
   outline: none;
 `;
-const AddressStripComponent = ({setOpenAddressDialog,address}) => {
-
+const AddressStripComponent = ({
+  setOpenAddressDialog,
+  address,
+  intrectable = true,
+}) => {
   return (
     <AddressSectionContainer>
       <AddressTitle>
@@ -49,13 +52,19 @@ const AddressStripComponent = ({setOpenAddressDialog,address}) => {
           Deliver To :<span>{address?.address?.Name}</span>
           <span>, {address?.address?.PinCode}</span>
         </AddressName>
-        <AddressSubText>
-          {address?.address?.FullAddress}
-        </AddressSubText>
+        <AddressSubText>{address?.address?.FullAddress}</AddressSubText>
       </AddressTitle>
-      <AddressChangeBtn role="button" onClick={()=>{setOpenAddressDialog(true)}}>
-        <span>Change Address</span>
-      </AddressChangeBtn>
+      {intrectable && (
+        <AddressChangeBtn
+          role="button"
+          onClick={() => {
+            setOpenAddressDialog(true);
+          }}
+        >
+          <span>Change Address</span>
+        </AddressChangeBtn>
+      )}
+      
     </AddressSectionContainer>
   );
 };

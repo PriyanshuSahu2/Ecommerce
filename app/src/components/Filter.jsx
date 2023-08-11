@@ -6,10 +6,11 @@ const Container = styled.div`
   width: 100%;
   align-items: center;
   text-align: center;
+  margin-bottom: 8px;
 `;
 
 const CheckBox = styled.input`
-  margin: 0 16px 0 0;
+  margin-right: 16px;
   padding: 10px;
   height: 16px;
   width: 16px;
@@ -18,6 +19,7 @@ const CheckBox = styled.input`
 const Labels = styled.span`
   font-size: 14px;
   display: inline-block;
+  color: #333;
 `;
 
 const Filter = ({
@@ -29,10 +31,7 @@ const Filter = ({
   parentLabel,
 }) => {
   const [isChecked, setIsChecked] = useState(false);
-  const [filters, setFilters] = useState("");
-  useEffect(() => {
-    console.log(filters);
-  },[]);
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const categoriesFromUrl = urlParams.get("Categories");
@@ -51,19 +50,19 @@ const Filter = ({
     } else {
       setSelectedBrands([]);
     }
-  }, [isChecked]);
+  }, [isChecked, setSelectedBrands, setSelectedCategories]);
 
   useEffect(() => {
-    if (Label === "Categories") {
+    if (parentLabel === "Categories") {
       setIsChecked(selectedCategories.includes(Label));
     }
-  }, [selectedCategories, Label]);
+  }, [selectedCategories, Label, parentLabel]);
 
   useEffect(() => {
-    if (Label === "Brand") {
+    if (parentLabel === "Brand") {
       setIsChecked(selectedBrands.includes(Label));
     }
-  }, [selectedBrands, Label]);
+  }, [selectedBrands, Label, parentLabel]);
 
   const applyFilter = (event) => {
     const currentURL = new URL(window.location.href);

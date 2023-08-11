@@ -3,11 +3,11 @@ const router = express.Router();
 const bcryptjs = require("bcryptjs");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const { verifyTokenAndAuth } = require("./verifyToken");
+const { verifyTokenAndAuth, verifyToken } = require("./verifyToken");
 const Review = mongoose.model("ReviewModel");
 const ProductModel = mongoose.model("ProductModel");
 // Create a new review
-router.post("/", verifyTokenAndAuth, async (req, res) => {
+router.post("/", verifyToken, async (req, res) => {
   try {
     const { id: customerId } = req.user;
     const review = new Review({ ...req.body, customerId });
@@ -42,7 +42,7 @@ router.post("/", verifyTokenAndAuth, async (req, res) => {
 router.get("/:productId", async (req, res) => {
   try {
     const { productId } = req.params;
-    const reviews = await Review.find({ productId });
+    const reviews = (await Review.find({ productId })).reverse();
 
     if (reviews.length === 0) {
       throw new Error("No reviews found for the product");

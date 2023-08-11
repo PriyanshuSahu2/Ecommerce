@@ -32,7 +32,7 @@ const PriceDetails = () => {
       <OrderSummary>
         <Items>
           <Label>Total MRP</Label>
-          <Value>Rs.69999</Value>
+          <Value>$69999</Value>
         </Items>
       </OrderSummary>
     </Container>

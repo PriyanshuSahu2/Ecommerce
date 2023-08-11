@@ -1,10 +1,12 @@
-import React from "react";
-
+import React, { useEffect, useState } from "react";
+import { Container } from "react-bootstrap";
 import { styled } from "styled-components";
 import CartItem from "../components/CartItem";
 import HeaderComponent from "../components/HeaderComponent";
-import { useSelector } from "react-redux";
-import { GiConfirmed } from "react-icons/gi";
+import { userRequest } from "../requestMethod";
+import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
+import { useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const Wrapper = styled.div`
   max-width: 980px;
@@ -13,19 +15,24 @@ const Wrapper = styled.div`
   min-height: 320px;
   color: #282c3f;
   display: flex;
+  padding: 20px;
 `;
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
+
 const ItemSectionContainer = styled.div`
   display: inline-block;
-  width: 64%;
+  width: 60%;
   padding-right: 20px;
   border-right: 1px solid #eaeaec;
+`;
 
+const MethodAndStatus = styled.div`
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
 `;
 
 const Summary = styled.div`
@@ -35,11 +42,12 @@ const Summary = styled.div`
   border-radius: 10px;
 `;
 
-const PaymentContainer = styled.div`
+const StatusContainer = styled.div`
   padding: 20px;
   border: 0.5px solid lightgray;
   border-radius: 10px;
   margin-bottom: 20px;
+  text-transform: capitalize;
 `;
 
 const Title = styled.h1`
@@ -64,96 +72,166 @@ const SummaryItemText = styled.span``;
 
 const SummaryItemPrice = styled.span``;
 
-const Button = styled.button`
-  width: 100%;
-  padding: 10px;
-  background-color: black;
+const Method = styled.span`
+  color: black;
+  font-weight: 700;
+`;
+const Status = styled.span`
   color: white;
   font-weight: 600;
-  cursor: pointer;
+  padding: 5px 15px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  background-color: #${(props) => props.bgcolor};
 `;
 
 const OrderSummaryContainer = styled.div`
-  width: 100%;
+  width: 40%;
   margin-left: 10px;
 `;
 
-const PaymentSelect = styled.div`
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  display: flex;
-  justify-content: space-between;
-`;
-const OrderConfirmationContainer = styled.div`
-  width: 980px;
-  height: 200px;
-
-  margin:10px;
-  display: flex;
-  flex-direction: column;
-
-  align-items: center;
-`;
-const ConfirmationIcon = styled(GiConfirmed)`
-  width: 50px;
-  height: 50px;
-  color: #03a685;
-  margin-top: 10px;
-`;
-const StatusText = styled.span`
-  color: #03a685;
-  font-weight: 700;
-  font-size: 32px;
-
-`;
-const StatusDesc = styled.span`
-  font-size: 20px;
-  font-weight: 500;
-  color: #282c3f;
-  text-align: center;
-`
 const OrderScreen = () => {
-  const cartProducts = useSelector((state) => state.cart.products);
-  const totalPrice = useSelector((state) => state.cart.totalPrice);
+  const { id } = useParams();
 
+  const [paymentStatus, setPaymentStatus] = useState("Pending");
+
+  const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
+
+  function createOrder(data, actions) {
+    return actions.order
+      .create({
+        purchase_units: [
+          {
+            amount: { value: order.total_amount },
+          },
+        ],
+      })
+      .then((orderID) => {
+        return orderID;
+      });
+  }
+
+  const updateStatus = async () => {
+    try {
+      await userRequest.put(`/orders/${id}`, {
+        payment_status: "Paid",
+      });
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Payment Successful",
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Payment Failed",
+      });
+    }
+  };
+
+  function onApprove(data, actions) {
+    return actions.order.capture().then(async function (details) {
+      updateStatus();
+      setPaymentStatus("Paid");
+    });
+  }
+  function onError(err) {
+    console.log(err);
+  }
+  useEffect(() => {
+    const loadPaypalScript = async () => {
+      const { data: clientId } = await userRequest.get("/keys/paypal");
+      paypalDispatch({
+        type: "resetOptions",
+        value: { clientId: clientId, currency: "USD" },
+      });
+      paypalDispatch({ type: "setLoadingStatus", value: "pending" });
+    };
+
+    loadPaypalScript();
+  }, [paypalDispatch]);
+
+  const [order, setOrder] = useState({});
+  useEffect(() => {
+    const getOrder = async () => {
+      const response = await userRequest(`/orders/${id}`);
+      console.log(response.data);
+      setOrder(response.data);
+      setPaymentStatus(response.data.payment_status);
+    };
+    getOrder();
+  }, [paymentStatus, id]);
+  console.log(order.status);
   return (
     <>
       <HeaderComponent />
       <Container>
-        <OrderConfirmationContainer>
-          <ConfirmationIcon />
-          <StatusText>Order Confirmed</StatusText>
-          <StatusDesc>Your order is confirmed. 
-            <br></br>You will receive confirmation E-mail/SMS shortly with expected delivery date for your items.</StatusDesc>
-        </OrderConfirmationContainer>
+        <h1 style={{ textAlign: "center" }}>Order ID: #{id}</h1>
         <Wrapper>
           <ItemSectionContainer>
-            {cartProducts.map((item) => {
-              console.log(item);
-              return <CartItem data={item} />;
+            <div>
+              <StatusContainer>
+                <Title>DELIVERY STATUS</Title>
+                <MethodAndStatus>
+                  <Method>
+                    Delivery to: {order.shipping_address?.Name},{" "}
+                    {order?.shipping_address?.PinCode},{" "}
+                    {order?.shipping_address?.FullAddress},
+                  </Method>
+                  <Status
+                    bgcolor={
+                      order.status === "Pending"
+                        ? "f39c12"
+                        : order.status === "Delivered"
+                        ? "CBEADC"
+                        : order.status === "Failed"
+                        ? "F5D1D1"
+                        : "black"
+                    }
+                  >
+                    {order.status}
+                  </Status>
+                </MethodAndStatus>
+              </StatusContainer>
+            </div>
+            {order?.products?.map((item) => {
+              return (
+                <CartItem key={item._id} data={item} interactable={false} />
+              );
             })}
           </ItemSectionContainer>
-
           <OrderSummaryContainer>
-          <PaymentContainer>
+            <StatusContainer>
               <Title>PAYMENT STATUS</Title>
-              <PaymentSelect>
-                <span>PayPal</span>
-                <span>Pending</span>
-              </PaymentSelect>
-            </PaymentContainer>
+              <MethodAndStatus>
+                <Method>{order.payment_method}</Method>
+                <Status
+                  bgcolor={
+                    order.payment_status === "Pending"
+                      ? "f39c12"
+                      : order.payment_status === "Paid"
+                      ? "2ecc71"
+                      : order.payment_status === "Failed"
+                      ? "F5D1D1"
+                      : "black"
+                  }
+                >
+                  {order.payment_status}
+                </Status>
+              </MethodAndStatus>
+            </StatusContainer>
             <Summary>
               <Title>ORDER SUMMARY</Title>
               <SummaryItem>
                 <SummaryItemText>Subtotal</SummaryItemText>
-                <SummaryItemPrice>Rs. {totalPrice}</SummaryItemPrice>
+                <SummaryItemPrice>$ {order.total_amount}</SummaryItemPrice>
               </SummaryItem>
               <SummaryItem>
                 <SummaryItemText>Estimated Shipping</SummaryItemText>
-                <SummaryItemPrice>Rs. 40</SummaryItemPrice>
+                <SummaryItemPrice>$ 40</SummaryItemPrice>
               </SummaryItem>
               <SummaryItem>
                 <SummaryItemText>Shipping Discount</SummaryItemText>
@@ -162,11 +240,17 @@ const OrderScreen = () => {
               <Hr />
               <SummaryItem type="total">
                 <SummaryItemText>Total</SummaryItemText>
-                <SummaryItemPrice>Rs. {totalPrice}</SummaryItemPrice>
+                <SummaryItemPrice>$ {order.total_amount}</SummaryItemPrice>
               </SummaryItem>
+              {/* <Button>CHECKOUT NOW</Button> */}
+              {paymentStatus === "Pending" && (
+                <PayPalButtons
+                  createOrder={createOrder}
+                  onApprove={onApprove}
+                  onError={onError}
+                />
+              )}
             </Summary>
-
-
           </OrderSummaryContainer>
         </Wrapper>
       </Container>

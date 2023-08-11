@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useState } from "react";
+import styled from "styled-components";
 
 const PaymentContainer = styled.div`
   display: flex;
@@ -83,9 +83,9 @@ const SummaryItemText = styled.span``;
 const SummaryItemPrice = styled.span``;
 
 const PaymentScreen = () => {
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiryDate, setExpiryDate] = useState('');
-  const [cvv, setCvv] = useState('');
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [cvv, setCvv] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -129,11 +129,11 @@ const PaymentScreen = () => {
           <SummaryTitle>ORDER SUMMARY</SummaryTitle>
           <SummaryItem>
             <SummaryItemText>Subtotal</SummaryItemText>
-            <SummaryItemPrice>Rs. {totalPrice}</SummaryItemPrice>
+            <SummaryItemPrice>$ {totalPrice}</SummaryItemPrice>
           </SummaryItem>
           <SummaryItem>
             <SummaryItemText>Estimated Shipping</SummaryItemText>
-            <SummaryItemPrice>Rs. 40</SummaryItemPrice>
+            <SummaryItemPrice>$ 40</SummaryItemPrice>
           </SummaryItem>
           <SummaryItem>
             <SummaryItemText>Shipping Discount</SummaryItemText>
@@ -141,7 +141,7 @@ const PaymentScreen = () => {
           </SummaryItem>
           <SummaryItem>
             <SummaryItemText>Total</SummaryItemText>
-            <SummaryItemPrice>Rs. {totalPrice}</SummaryItemPrice>
+            <SummaryItemPrice>$ {totalPrice}</SummaryItemPrice>
           </SummaryItem>
         </Summary>
       </OrderSummaryContainer>

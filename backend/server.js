@@ -12,7 +12,6 @@ require("./models/featureProducts_model");
 require("./models/order_model");
 require("./models/review_model");
 
-
 const mongoose = require("mongoose");
 const userRouter = require("./router/user_router");
 const productRouter = require("./router/product_router");
@@ -24,7 +23,9 @@ const addressRouter = require("./router/address_router");
 const featureProductsRouter = require("./router/featureProducts_router");
 const orderRoutes = require("./router/order_routes");
 const reviewRoutes = require("./router/review_routes");
+const statsRoutes = require("./router/stats_routes");
 const dotenv = require("dotenv");
+const path = require("path");
 
 const PORT = 5000;
 const app = express();
@@ -32,7 +33,8 @@ const cors = require("cors");
 dotenv.config();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 mongoose
   .connect(process.env.MONGODB_URL)
@@ -42,6 +44,9 @@ mongoose
 app.get("/api/keys/paypal", (req, res) => {
   res.send(process.env.PAYPAL_CLIENT_ID || "sb");
 });
+
+// Serve static files from the "uploads" directory
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 // Use the user router for '/user' routes
 app.use("/api/user", userRouter);
@@ -54,7 +59,9 @@ app.use("/api/address", addressRouter);
 app.use("/api/featuredProducts", featureProductsRouter);
 app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/sales", statsRoutes);
 
 app.listen(PORT, () => {
+  console.clear();
   console.log(`server Started on ${PORT}`);
 });

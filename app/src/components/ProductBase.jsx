@@ -1,8 +1,8 @@
 import React from "react";
 import { styled } from "styled-components";
 import { TiStarFullOutline } from "react-icons/ti";
-import { AiOutlineHeart } from "react-icons/ai";
 import { Link } from "react-router-dom";
+import { IMAGE_BASE_URL } from "../requestMethod";
 const Container = styled.div`
   width: 210px;
   text-align: left;
@@ -41,16 +41,16 @@ const ProductRatingContainer = styled.div`
 const ProductImageSliderContainer = styled.div`
   position: relative;
   width: 210px;
-  height: 280px;
+  height: 270px;
 `;
 const ProductInfo = styled.div`
   position: relative;
   z-index: 3;
   background: #fff;
-  padding: 0 10px;
-  height: 100%;
-  margin-top: 12px;
-  -webkit-box-sizing: border-box;
+  padding: 10px 10px;
+  height: 80px;
+  min-height: 70px;
+
   box-sizing: border-box;
   overflow: hidden;
   padding-bottom: 5px;
@@ -58,6 +58,7 @@ const ProductInfo = styled.div`
 const ProductImage = styled.img`
   width: 100%;
   display: block;
+  height: 100%;
   overflow-clip-margin: content-box;
   overflow: clip;
 `;
@@ -70,10 +71,6 @@ const ProductBrand = styled.h3`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  -webkit-margin-before: initial;
-  ${Container}:hover & {
-    visibility: hidden;
-  }
 `;
 const ProductName = styled.h4`
   color: #3d3d3d;
@@ -114,82 +111,29 @@ const TotalRating = styled.span`
   margin: 0 4px;
   color: black;
 `;
-const ProductAction = styled.div`
-  display: none;
-  position: absolute;
-  z-index: 3;
-  left: 0;
-  top: 245px;
-  background: #fff;
-  width: 100%;
-  padding: 16px 10px;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -ms-flex-wrap: nowrap;
-  flex-wrap: nowrap;
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-  ${Container}:hover & {
-    display: flex;
-  }
-`;
-const ProductWishListButton = styled.span`
-  width: 100%;
-  text-align: center;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-  border-radius: 2px;
-  padding: 5px;
-  border: 1px solid #d4d5d9;
-  color: #282c3f;
-  letter-spacing: 0.3px;
-  &:hover {
-    border: 1px solid black;
-    cursor: pointer;
-  }
-`;
-const WishListBtn = styled(AiOutlineHeart)`
-  margin: -4px 8px;
-  width: 17px;
-  height: 22px;
-  background-position: -315px -186px;
-`;
-const ProductBase = ({ data }) => {
 
+const ProductBase = ({ data }) => {
   return (
-    <Link to={"/product/"+data._id}>
+    <Link to={"/product/" + data?._id}>
       <Container>
         <ProductRatingContainer>
-          <Rating>{data.rating}</Rating>
+          <Rating>{data?.rating?.toFixed(1)}</Rating>
           <Star />
           <Seperator>|</Seperator>
-          <TotalRating>4k</TotalRating>
+          <TotalRating>{data?.totalReviews}</TotalRating>
         </ProductRatingContainer>
         <div>
           <ProductImageSliderContainer>
-            <ProductImage src={data.img[0]} />
+            <ProductImage src={`${IMAGE_BASE_URL}/products/${data?.img[0]}`} />
           </ProductImageSliderContainer>
           <ProductInfo>
-            <ProductBrand>{data.brand}</ProductBrand>
-            <ProductName>{data.productName}</ProductName>
+            <ProductBrand>{data?.brand}</ProductBrand>
+            <ProductName>{data?.productName}</ProductName>
             <ProductPrice>
-              <Price>Rs. {data.price}</Price>
+              <Price>${data?.price}</Price>
             </ProductPrice>
           </ProductInfo>
         </div>
-        <ProductAction>
-          <ProductWishListButton>
-            <WishListBtn />
-            Add To Cart
-          </ProductWishListButton>
-        </ProductAction>
       </Container>
     </Link>
   );

@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const { verifyTokenAndAuth } = require("./verifyToken");
+const { verifyTokenAndAuth, verifyToken } = require("./verifyToken");
 const AddressModel = mongoose.model("AddressModel");
 
 // Add or Update Address
-router.post("/add", verifyTokenAndAuth, async (req, res) => {
+router.post("/add", verifyToken, async (req, res) => {
   const { Name, MobileNumber, PinCode, FullAddress } = req.body;
   const { id: userId } = req.user;
 
@@ -31,7 +31,7 @@ router.post("/add", verifyTokenAndAuth, async (req, res) => {
   }
 });
 
-router.get("/", verifyTokenAndAuth, (req, res) => {
+router.get("/", verifyToken, (req, res) => {
   const { id: userId } = req.user;
 
   AddressModel.findOne({ userId })

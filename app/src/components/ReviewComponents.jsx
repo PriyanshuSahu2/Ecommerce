@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { styled } from "styled-components";
-import { TiStarFullOutline, TiStarOutline } from "react-icons/ti";
+import { TiStarFullOutline } from "react-icons/ti";
 import { CiStar } from "react-icons/ci";
 import CustomerReviewsComponent from "./CustomerReviewsComponent";
 import { publicRequest, userRequest } from "../requestMethod";
+import { toast } from "react-toastify";
 
 const Container = styled.div`
   width: 100%;
@@ -113,7 +114,7 @@ const CancelButton = styled(SubmitButton)`
   border: 1px solid #d4d5d9;
 `;
 
-const ReviewComponents = ({ productId, averageRating }) => {
+const ReviewComponents = ({ productId, averageRating, setUpdate, update }) => {
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
   const [isTextAreaVisible, setTextAreaVisible] = useState(false);
@@ -132,17 +133,26 @@ const ReviewComponents = ({ productId, averageRating }) => {
     setReview("");
     setTextAreaVisible(false);
   };
-
-  const handleFormSubmit = (event) => {
-    event.preventDefault();
+  const user = JSON.parse(localStorage.getItem("persist:root")).user;
+  const customerName = JSON.parse(user).currentUser.fullName;
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    console.log(customerName);
     // Perform submit logic here
-    const response = userRequest.post("reviews/", {
-      customerName: "Priyanshu Sahu",
-      rating: rating,
-      review: review,
-      productId: productId,
-    });
-    
+    try {
+      const res = await userRequest.post("reviews/", {
+        customerName: customerName,
+        rating: rating,
+        review: review,
+        productId: productId,
+      });
+      toast.success("Review Added Successfully");
+      setUpdate(res);
+      handleCancelClick();
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.error);
+    }
   };
 
   const renderStars = () => {
@@ -159,11 +169,6 @@ const ReviewComponents = ({ productId, averageRating }) => {
     return stars;
   };
 
-  const formatDate = (date) => {
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return new Date(date).toLocaleDateString(undefined, options);
-  };
-
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
@@ -178,7 +183,7 @@ const ReviewComponents = ({ productId, averageRating }) => {
     };
 
     getProductReviews(); // Call the `getProducts` function
-  }, [productId]);
+  }, [productId, update]);
   return (
     <Container>
       <Wrapper>

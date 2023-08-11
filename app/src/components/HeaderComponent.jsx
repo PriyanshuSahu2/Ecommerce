@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -10,10 +10,12 @@ import { HiMiniBars3BottomLeft } from "react-icons/hi2";
 import { PiHandbagLight } from "react-icons/pi";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-
+import Sidebar from "./Sidebar";
+import { useRef } from "react";
+import { RiAdminLine } from "react-icons/ri";
 const Header = styled.header`
   width: 100%;
-  border-bottom: 1px solid  #FF3E6C;
+  border-bottom: 1px solid #ff3e6c;
 `;
 const Container = styled.div``;
 const Top = styled(Col)`
@@ -46,7 +48,7 @@ const Logo = styled.span`
   font-family: "Akronim", cursive;
   font-size: 30px;
   letter-spacing: 5px;
-  color:  #FF3E6C;
+  color: #ff3e6c;
 `;
 const CartButton = styled.div`
   display: flex;
@@ -58,6 +60,7 @@ const CartButton = styled.div`
   height: 24px;
   text-decoration: none;
 `;
+
 const Bottom = styled.div``;
 const Badge = styled.span`
   position: absolute;
@@ -78,15 +81,71 @@ const Badge = styled.span`
 const CartIcon = styled(PiHandbagLight)`
   color: black !important;
 `;
+
+const UserIcon = styled(RiAdminLine)`
+  font-size: 25px;
+  margin: 0 20px;
+  cursor: pointer;
+`;
+
+const Dropdown = styled.div`
+  position: absolute;
+  top: 40px; /* Adjust the distance from the user icon */
+  right: 0;
+  width: 200px;
+  background-color: white;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  padding: 10px;
+  display: ${({ isOpen }) => (isOpen ? "block" : "none")};
+`;
+
+const DropdownItem = styled(Link)`
+  padding: 5px 10px;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  color: black;
+  &:hover {
+    background-color: #f2f2f2;
+  }
+`;
 const HeaderComponent = () => {
   const cartQuantity = useSelector((state) => state.cart.quantity);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const menus = useRef(null);
+  const currentUser = useSelector((state) => state.user.currentUser);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!menus.current.contains(event.target)) {
+        setShowSidebar(false);
+      }
+    };
 
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
   return (
     <Header>
       <Container>
         <Top>
-          <Left>
-            <HiMiniBars3BottomLeft />
+          <Left ref={menus}>
+            <HiMiniBars3BottomLeft
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                setShowSidebar(!showSidebar);
+              }}
+            />
+            <Sidebar showSidebar={showSidebar} />
           </Left>
           <Middle>
             <Link to={"/"} style={{ textDecoration: "none" }}>
@@ -101,6 +160,19 @@ const HeaderComponent = () => {
                 <Badge>{cartQuantity}</Badge>{" "}
               </CartButton>
             </Link>
+            <UserIcon onClick={toggleDropdown} />
+
+            {currentUser ? (
+              <Dropdown isOpen={isDropdownOpen}>
+                <DropdownItem to={"/profile"}>Profile</DropdownItem>
+                <DropdownItem to={"/admin"}>Admin</DropdownItem>
+                <DropdownItem>Logout</DropdownItem>
+              </Dropdown>
+            ) : (
+              <Dropdown isOpen={isDropdownOpen}>
+                <DropdownItem>Login</DropdownItem>
+              </Dropdown>
+            )}
           </Right>
         </Top>
         <Bottom></Bottom>

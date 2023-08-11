@@ -4,14 +4,16 @@ import { styled } from "styled-components";
 import AddressStripComponent from "../components/AddressStripComponent";
 import CartItem from "../components/CartItem";
 import HeaderComponent from "../components/HeaderComponent";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AddressDialogBox from "../components/AddressDialogBox";
-import { publicRequest, userRequest } from "../requestMethod";
-import { FaPaypal } from "react-icons/fa";
+import { userRequest } from "../requestMethod";
+
 import { useNavigate } from "react-router-dom";
+import { deleteCart } from "../redux/cartRedux";
+import CartItemSkeleton from "../components/SkeletonsComponents/CartItemSkeleton";
+import AddressStripSkeleton from "../components/SkeletonsComponents/AddressStripSkeleton";
 
 const Wrapper = styled.div`
-  max-width: 980px;
   margin: auto;
   padding: 0 10px 16px;
   min-height: 320px;
@@ -21,28 +23,10 @@ const Wrapper = styled.div`
 
 const ItemSectionContainer = styled.div`
   display: inline-block;
-  width: 64%;
+  width: 60%;
   padding-right: 20px;
   border-right: 1px solid #eaeaec;
   padding-top: 32px;
-`;
-
-const PaymentOptions = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
-`;
-
-const PaymentOption = styled.label`
-  display: flex;
-  align-items: center;
-  margin-right: 20px;
-  font-size: 16px;
-  cursor: pointer;
-
-  input[type="radio"] {
-    margin-right: 8px;
-  }
 `;
 
 const Summary = styled.div`
@@ -91,7 +75,7 @@ const Button = styled.button`
 `;
 
 const OrderSummaryContainer = styled.div`
-  width: 100%;
+  width: 40%;
   margin-left: 10px;
   margin-top: 30px;
 `;
@@ -105,9 +89,8 @@ const PaymentSelect = styled.select`
 
   &.vibrate {
     animation: vibrateAnimation 0.3s infinite linear;
-    background-color: black ;
+    background-color: black;
     color: white;
-    
   }
 
   @keyframes vibrateAnimation {
@@ -138,12 +121,16 @@ const CartPage = () => {
   const [onAddressChange, setOnAddressChange] = useState(0);
   const [selectedPayment, setSelectedPayment] = useState("");
   const [checkoutClicked, setCheckoutClicked] = useState(false);
-
+  const [loading, setLoading] = useState(true);
+  const [addressLoading, setAddressLoading] = useState(true);
+  const dispatch = useDispatch();
   useEffect(() => {
     const getAddress = async () => {
       try {
         const response = await userRequest("/address/");
         setAddress(response.data);
+        setAddressLoading(false);
+        setLoading(false);
       } catch (err) {
         console.log(`AllAddress ${err}`);
       }
@@ -156,9 +143,30 @@ const CartPage = () => {
     setSelectedPayment(e.target.value);
   };
 
-  const handleCheckOut = () => {
-    if (selectedPayment == "paypal") {
-      navigate("/payment");
+  const handleCheckOut = async () => {
+    if (selectedPayment === "paypal") {
+      try {
+        const products = cartProducts.map((item) => ({
+          productId: item._id,
+          quantity: item.quantity,
+          selectedSize: item.selectedSize,
+          price: item.price,
+          category: item.categories,
+          brand: item.brand,
+        }));
+        console.log(products);
+        const orderBody = {
+          products: products,
+          total_amount: totalPrice,
+          payment_method: selectedPayment,
+          shipping_address: address.address,
+        };
+        const res = await userRequest.post("/orders", orderBody);
+        dispatch(deleteCart());
+        navigate(`/order/${res.data._id}`);
+      } catch (err) {
+        console.log(err);
+      }
     } else {
       setCheckoutClicked(true);
       setTimeout(() => {
@@ -172,14 +180,26 @@ const CartPage = () => {
       <Container>
         <Wrapper>
           <ItemSectionContainer>
-            <AddressStripComponent
-              setOpenAddressDialog={setOpenAddressDialog}
-              address={address}
-            />
-            {cartProducts.map((item) => {
-              console.log(item);
-              return <CartItem data={item} />;
-            })}
+            {addressLoading ? (
+              <AddressStripSkeleton />
+            ) : (
+              <AddressStripComponent
+                setOpenAddressDialog={setOpenAddressDialog}
+                address={address}
+              />
+            )}
+            {loading ? (
+              <>
+                <CartItemSkeleton />
+                <CartItemSkeleton />
+                <CartItemSkeleton />
+                <CartItemSkeleton />
+              </>
+            ) : (
+              cartProducts?.map((item) => {
+                return <CartItem data={item} />;
+              })
+            )}
           </ItemSectionContainer>
           <OrderSummaryContainer>
             <PaymentContainer>
@@ -198,11 +218,11 @@ const CartPage = () => {
               <Title>ORDER SUMMARY</Title>
               <SummaryItem>
                 <SummaryItemText>Subtotal</SummaryItemText>
-                <SummaryItemPrice>Rs. {totalPrice}</SummaryItemPrice>
+                <SummaryItemPrice>$ {totalPrice}</SummaryItemPrice>
               </SummaryItem>
               <SummaryItem>
                 <SummaryItemText>Estimated Shipping</SummaryItemText>
-                <SummaryItemPrice>Rs. 40</SummaryItemPrice>
+                <SummaryItemPrice>$ 40</SummaryItemPrice>
               </SummaryItem>
               <SummaryItem>
                 <SummaryItemText>Shipping Discount</SummaryItemText>
@@ -211,7 +231,7 @@ const CartPage = () => {
               <Hr />
               <SummaryItem type="total">
                 <SummaryItemText>Total</SummaryItemText>
-                <SummaryItemPrice>Rs. {totalPrice}</SummaryItemPrice>
+                <SummaryItemPrice>$ {totalPrice}</SummaryItemPrice>
               </SummaryItem>
               <Button onClick={handleCheckOut}>CHECKOUT NOW</Button>
             </Summary>

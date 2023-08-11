@@ -5,6 +5,7 @@ import { AiFillDelete } from "react-icons/ai";
 import DialogBox from "./DialogBox";
 import { useDispatch } from "react-redux";
 import { deleteCartItem } from "../redux/cartRedux";
+import { IMAGE_BASE_URL } from "../requestMethod";
 
 const Container = styled.div`
   margin-bottom: 8px;
@@ -33,8 +34,10 @@ const ProductImageSliderContainer = styled.div`
 `;
 const ProductImage = styled.img`
   width: 100%;
+  height: 100%;
   display: block;
   overflow-clip-margin: content-box;
+  object-fit: contain;
   overflow: clip;
 `;
 const RightContainer = styled.div`
@@ -104,7 +107,7 @@ const DeleteBtn = styled(AiFillDelete)`
   right: 10px;
   cursor: pointer;
 `;
-const CartItem = ({ data }) => {
+const CartItem = ({ data, interactable = true }) => {
   const [showDialog, setShowDialog] = useState(false);
   const dispatch = useDispatch();
   // const productQuantity = useSelector((state) => state.cart.products.quantity);
@@ -124,40 +127,45 @@ const CartItem = ({ data }) => {
       <Left>
         {/* <a href=""> */}
         <ProductImageSliderContainer>
-          <ProductImage src={data.img[0]} />
+          <ProductImage src={`${IMAGE_BASE_URL}/products/${data?.img[0]}`} />
         </ProductImageSliderContainer>
         {/* </a> */}
       </Left>
       <Right>
         <RightContainer>
           <ProductInfoContainer>
-            <ProductBrand>{data.brand}</ProductBrand>
-            <ProductName> {data.productName}</ProductName>
+            <ProductBrand>{data?.brand}</ProductBrand>
+            <ProductName> {data?.productName}</ProductName>
           </ProductInfoContainer>
 
-          <SizeAndQtyContainer onClick={handleOpenDialog}>
-            <SizeSelect>Size: {data.selectedSize}</SizeSelect>
-            <QtySelect>Qty: {data.quantity}</QtySelect>
+          <SizeAndQtyContainer onClick={interactable ? handleOpenDialog : null}>
+            <SizeSelect>Size: {data?.selectedSize}</SizeSelect>
+            <QtySelect>Qty: {data?.quantity}</QtySelect>
           </SizeAndQtyContainer>
           {showDialog && (
             <DialogBox
               title="Select Size & Quantity"
-              quantity={data.quantity}
-              size={data.selectedSize}
-              sizes={data.sizes}
+              quantity={data?.quantity}
+              size={data?.selectedSize}
+              sizes={data?.sizes}
               onClose={handleCloseDialog}
-              id={data.cartId}
+              id={data?.cartId}
             />
           )}
           <PriceContainer>
-            <TotalPrice>Rs. {data.price} x {data.quantity} = {data.price*data.quantity}</TotalPrice>
+            <TotalPrice>
+              $ {data?.price} x {data?.quantity} ={" "}
+              {data?.price * data?.quantity}
+            </TotalPrice>
           </PriceContainer>
           <Info>
             <MdLocalOffer /> Free delivery on This Product
           </Info>
         </RightContainer>
       </Right>
-      <DeleteBtn onClick={deleteProductFromCart} />
+      {interactable && (
+        <DeleteBtn onClick={interactable ? deleteProductFromCart : null} />
+      )}
     </Container>
   );
 };

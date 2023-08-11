@@ -14,7 +14,7 @@ const verifyToken = (req, res, next) => {
     
       next();
     });
-  } else {
+  } else { 
     return res.status(401).json(authHeader);
   }
 };
