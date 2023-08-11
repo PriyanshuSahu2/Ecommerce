@@ -15,10 +15,11 @@ export const login = async (dispatch, user) => {
     });
     dispatch(loginSuccess(res.data));
   } catch (err) {
+    console.log(err)
     await Swal.fire({
       icon: "error",
       title: "Login Failed",
-      text: err.response.data.error,
+      text: err.response,
     });
     dispatch(loginFailure());
   }

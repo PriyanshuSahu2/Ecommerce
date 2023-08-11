@@ -127,7 +127,7 @@ const AdminProductsPage = () => {
 
           {products.map((product) => (
             <ProductCard
-              key={product.productId}
+              key={product?.productId}
               product={product}
               setUpdateItem={setUpdateItem}
             />

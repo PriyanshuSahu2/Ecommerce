@@ -132,8 +132,8 @@ const Signup = ({ handleToggle }) => {
       const res = await publicRequest.post("/user/signup", formData);
       console.log(res);
       await Swal.fire({
-        icon: "error",
-        title: "Error",
+        icon: "success",
+        title: "Success",
         text: res.data.message,
       });
     } catch (error) {
@@ -161,7 +161,7 @@ const Signup = ({ handleToggle }) => {
         email: formData.email,
       });
       console.log(res);
-      setVerificationStatus(res.data);
+      setVerificationStatus(res?.data);
       if (res.status === 200) {
         setIsCodeSent(true);
       }

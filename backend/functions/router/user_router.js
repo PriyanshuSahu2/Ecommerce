@@ -11,6 +11,8 @@ const {
   verifyToken,
   verifyTokenAndAuth,
 } = require("./verifyToken");
+const { GMAIL, GMAIL_PASS, JWT_SECRET } = require("../config");
+const OTPModel = require("../models/otp_model");
 
 dotenv.config();
 
@@ -20,15 +22,15 @@ const generateOTP = () => {
 
 const OTPs = {};
 
-console.log(process.env.GMAIL);
 // Nodemailer configuration
 const transporter = nodemailer.createTransport({
   service: "Gmail", // e.g., 'Gmail'
   auth: {
-    user: process.env.GMAIL,
-    pass: process.env.GMAIL_PASS,
+    user: GMAIL,
+    pass: GMAIL_PASS,
   },
 });
+
 router.post("/send-otp", async (req, res) => {
   const { email } = req.body;
   if (!email) {
@@ -47,10 +49,24 @@ router.post("/send-otp", async (req, res) => {
   transporter.sendMail(mail, (err, info) => {
     if (err) {
       console.log(err);
+
       res.status(500).send(err.message);
     } else {
       console.log("Email Sent: " + info.response);
-      res.status(200).send("Verification email sent Successfully");
+      const expiration = new Date(Date.now() + 5 * 60 * 1000);
+      const newOTP = new OTPModel({
+        email: email,
+        otp: OTP,
+        expiration: expiration,
+      });
+      newOTP
+        .save()
+        .then(() => {
+          return res.status(200).send("Verification email sent Successfully");
+        })
+        .catch((err) => {
+          return res.status(500).send(err);
+        });
     }
   });
 });
@@ -65,9 +81,12 @@ router.post("/signup", async (req, res) => {
       isAdmin,
       verificationCode,
     } = req.body;
+    const otp = await OTPModel.findOne({ email });
 
-    if (OTPs[email] !== parseInt(verificationCode)) {
-      return res.status(400).json({ error: "Invalid OTP" });
+    if (otp.otp == verificationCode) {
+      return res
+        .status(400)
+        .json({ error: "Invalid OTP or Expired" + otp.otp });
     }
 
     const userInDB = await UserModel.findOne({ email: email });
@@ -113,7 +132,7 @@ router.post("/login", async (req, res) => {
               id: userInDB._id,
               isAdmin: userInDB.isAdmin,
             },
-            process.env.JWT_SECRET
+            JWT_SECRET
           );
           // Passwords match, user is authenticated
           // Here, you can generate a token or perform any other login-related operations
