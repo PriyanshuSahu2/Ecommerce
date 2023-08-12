@@ -275,7 +275,6 @@ const ProductPage = () => {
               {product.img?.map((image, idx) => {
                 return (
                   <ProductImagesContainer>
-                  
                     <ProductImage src={`${IMAGE_BASE_URL}/products/${image}`} />
                   </ProductImagesContainer>
                 );

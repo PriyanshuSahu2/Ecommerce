@@ -186,6 +186,7 @@ const CartPage = () => {
               <AddressStripComponent
                 setOpenAddressDialog={setOpenAddressDialog}
                 address={address}
+                className={checkoutClicked && address === {} ? "vibrate" : ""}
               />
             )}
             {loading ? (

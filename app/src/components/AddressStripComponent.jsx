@@ -11,6 +11,30 @@ const AddressSectionContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
+
+  &.vibrate {
+    animation: vibrateAnimation 0.3s infinite linear;
+    background-color: black;
+    color: white;
+  }
+
+  @keyframes vibrateAnimation {
+    0% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-10px);
+    }
+    50% {
+      transform: translateX(10px);
+    }
+    75% {
+      transform: translateX(-10px);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
 `;
 const AddressTitle = styled.div`
   font-size: 14px;
@@ -64,7 +88,6 @@ const AddressStripComponent = ({
           <span>Change Address</span>
         </AddressChangeBtn>
       )}
-      
     </AddressSectionContainer>
   );
 };

@@ -125,7 +125,6 @@ const Sidebar = ({ showSidebar }) => {
         }
       });
     } else {
-
       navigate(to);
     }
   };

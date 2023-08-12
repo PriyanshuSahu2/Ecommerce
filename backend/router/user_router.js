@@ -37,7 +37,6 @@ router.post("/send-otp", async (req, res) => {
   }
 
   const OTP = generateOTP();
-  OTPs[email] = OTP;
   const mail = {
     from: "help.markethub@gmail.com",
     to: email,
@@ -45,28 +44,41 @@ router.post("/send-otp", async (req, res) => {
     text: `OTP is ${OTP}`,
   };
 
-  transporter.sendMail(mail, (err, info) => {
-    if (err) {
-      console.log(err);
-      res.status(500).send(err.message);
-    } else {
-      console.log("Email Sent: " + info.response);
-      const expiration = new Date(Date.now() + 5 * 60 * 1000);
-      const newOTP = new OTPModel({
-        email: email,
-        otp: OTP,
-        expiration: expiration,
-      });
-      newOTP
-        .save()
-        .then(() => {
-          return res.status(200).send("Verification email sent Successfully");
-        })
-        .catch((err) => {
-          return res.status(500).send(err);
+  // Check if the email already exists in the OTP model
+  OTPModel.findOne({ email: email })
+    .then((existingOTP) => {
+      if (existingOTP) {
+        // Update the existing OTP
+        existingOTP.otp = OTP;
+        existingOTP.expiration = new Date(Date.now() + 5 * 60 * 1000);
+        return existingOTP.save();
+      } else {
+        // Create a new OTP entry
+        const expiration = new Date(Date.now() + 5 * 60 * 1000);
+        const newOTP = new OTPModel({
+          email: email,
+          otp: OTP,
+          expiration: expiration,
         });
-    }
-  });
+        return newOTP.save();
+      }
+    })
+    .then((savedOTP) => {
+      // Send the OTP email
+      transporter.sendMail(mail, (err, info) => {
+        if (err) {
+          console.log(err);
+          res.status(500).send(err.message);
+        } else {
+          console.log("Email Sent: " + info.response);
+          return res.status(200).send("Verification email sent Successfully");
+        }
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send(err.message);
+    });
 });
 
 router.post("/signup", async (req, res) => {
@@ -81,9 +93,8 @@ router.post("/signup", async (req, res) => {
     } = req.body;
 
     const otp = await OTPModel.findOne({ email: email });
-    console.log(otp);
-    console.log(otp.otp, verificationCode);
-    if (otp.otp !== verificationCode) {
+
+    if (otp.otp != verificationCode) {
       return res.status(400).json({ error: "Invalid OTP Or Expired" });
     }
 
