@@ -11,6 +11,7 @@ const {
   verifyToken,
   verifyTokenAndAuth,
 } = require("./verifyToken");
+const OTPModel = require("../models/otp_model");
 
 dotenv.config();
 
@@ -50,7 +51,20 @@ router.post("/send-otp", async (req, res) => {
       res.status(500).send(err.message);
     } else {
       console.log("Email Sent: " + info.response);
-      res.status(200).send("Verification email sent Successfully");
+      const expiration = new Date(Date.now() + 5 * 60 * 1000);
+      const newOTP = new OTPModel({
+        email: email,
+        otp: OTP,
+        expiration: expiration,
+      });
+      newOTP
+        .save()
+        .then(() => {
+          return res.status(200).send("Verification email sent Successfully");
+        })
+        .catch((err) => {
+          return res.status(500).send(err);
+        });
     }
   });
 });
@@ -66,8 +80,9 @@ router.post("/signup", async (req, res) => {
       verificationCode,
     } = req.body;
 
-    if (OTPs[email] !== parseInt(verificationCode)) {
-      return res.status(400).json({ error: "Invalid OTP" });
+    const otp = OTPModel.findOne({ email: email });
+    if (otp.otp !== verificationCode) {
+      return res.status(400).json({ error: "Invalid OTP Or Expired" });
     }
 
     const userInDB = await UserModel.findOne({ email: email });
@@ -163,8 +178,9 @@ router.post("/reset-password", async (req, res) => {
       return res.status(400).json({ error: "User Not Found" });
     }
 
-    if (OTPs[email] !== parseInt(verificationCode)) {
-      return res.status(400).json({ error: "Invalid OTP" });
+    const otp = OTPModel.findOne({ email: email });
+    if (otp.otp !== verificationCode) {
+      return res.status(400).json({ error: "Invalid OTP Or Expired" });
     }
 
     const hashedPassword = await bcryptjs.hash(password, 10);
