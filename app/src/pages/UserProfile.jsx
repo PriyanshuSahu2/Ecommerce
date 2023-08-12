@@ -172,17 +172,19 @@ const UserProfile = () => {
                 <span>Confirm New Password</span>
               )}
             </ProfileField>
-            <ProfileField>
-              <div className="d-flex align-items-center">
-                <input
-                  style={{ width: "fit-content" }}
-                  className="m-0 "
-                  type="checkbox"
-                  checked={userData?.isAdmin}
-                />
-                <label className="m-0 ms-2">Is Admin</label>
-              </div>
-            </ProfileField>
+            {userData?.isAdmin && (
+              <ProfileField>
+                <div className="d-flex align-items-center">
+                  <input
+                    style={{ width: "fit-content" }}
+                    className="m-0 "
+                    type="checkbox"
+                    checked={userData?.isAdmin}
+                  />
+                  <label className="m-0 ms-2">Is Admin</label>
+                </div>
+              </ProfileField>
+            )}
 
             {isEditMode ? (
               <Button type="submit" onClick={(e) => handleSubmit(e)}>

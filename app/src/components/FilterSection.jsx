@@ -25,15 +25,15 @@ const HeaderTitle = styled.span`
   color: #333;
 `;
 
-const ClearAllBtn = styled.span`
-  position: absolute;
-  top: 0;
-  right: 0;
-  font-weight: 700;
-  color: #ff3f6c;
-  font-size: 13px;
-  cursor: pointer;
-`;
+// const ClearAllBtn = styled.span`
+//   position: absolute;
+//   top: 0;
+//   right: 0;
+//   font-weight: 700;
+//   color: #ff3f6c;
+//   font-size: 13px;
+//   cursor: pointer;
+// `;
 
 const CategoryContainer = styled.div`
   position: relative;
@@ -92,7 +92,6 @@ const FilterSection = ({
     <Container>
       <HeaderContainer>
         <HeaderTitle>FILTERS</HeaderTitle>
-        <ClearAllBtn onClick={null}>CLEAR ALL</ClearAllBtn>
       </HeaderContainer>
       <CategoryContainer>
         <FilterHeader>CATEGORIES</FilterHeader>

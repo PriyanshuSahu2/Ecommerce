@@ -6,6 +6,7 @@ import { Button, Form, Image } from "react-bootstrap";
 import ShoppingCart from "../images/shopping-cart.png";
 import LoadingBar from "../components/Loadings/LoadingBar";
 import LoadingClip from "../components/Loadings/LoadingClip";
+import { useNavigate } from "react-router-dom";
 const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -90,6 +91,7 @@ const VerificationSpan = styled.span`
 const VerificationMessage = styled.p`
   color: #0ca9f1;
 `;
+
 const Signup = ({ handleToggle }) => {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [formData, setFormData] = useState({
@@ -103,6 +105,7 @@ const Signup = ({ handleToggle }) => {
   const [loading, setLoading] = useState(false);
   const [verificationLoading, setVerificationLoading] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState(false);
+  const navigate = useNavigate();
   const handleSignup = async (e) => {
     e.preventDefault();
     if (loading) return;
@@ -132,10 +135,11 @@ const Signup = ({ handleToggle }) => {
       const res = await publicRequest.post("/user/signup", formData);
       console.log(res);
       await Swal.fire({
-        icon: "error",
-        title: "Error",
+        icon: "success",
+        title: "success",
         text: res.data.message,
       });
+      navigate("/auth");
     } catch (error) {
       console.log("error", error);
       Swal.fire({
@@ -212,9 +216,17 @@ const Signup = ({ handleToggle }) => {
               maxLength="6"
               placeholder="Enter Verification Code"
               title="Verification Code"
+              name="verificationCode"
               onChange={handleChange}
             />
           )}
+          <StyledFormControl
+            type="Number"
+            placeholder="Mobile NumbeR̥"
+            id="mobileNumber"
+            name="mobileNumber" // Add the name attribute here
+            onChange={handleChange} // Apply the handleChange function
+          />
           <StyledFormControl
             type="password"
             placeholder="Password"

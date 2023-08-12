@@ -11,7 +11,7 @@ const AddressSectionContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-
+  color: black;
   &.vibrate {
     animation: vibrateAnimation 0.3s infinite linear;
     background-color: black;
@@ -42,12 +42,13 @@ const AddressTitle = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: inherit;
 `;
 const AddressName = styled.div`
   width: 100%;
   display: flex;
   white-space: pre;
-  color: black;
+  color: inherit;
   font-weight: 700;
 `;
 const AddressSubText = styled.div`
@@ -58,19 +59,22 @@ const AddressSubText = styled.div`
   text-overflow: ellipsis;
   text-transform: capitalize;
   font-weight: 600;
+  color: inherit;
 `;
 const AddressChangeBtn = styled.button`
   font-size: 12px;
   line-height: inherit;
   outline: none;
+  color: inherit;
 `;
 const AddressStripComponent = ({
   setOpenAddressDialog,
   address,
   intrectable = true,
+  addClass,
 }) => {
   return (
-    <AddressSectionContainer>
+    <AddressSectionContainer className={addClass}>
       <AddressTitle>
         <AddressName>
           Deliver To :<span>{address?.address?.Name}</span>

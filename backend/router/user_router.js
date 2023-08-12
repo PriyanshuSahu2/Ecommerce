@@ -93,7 +93,7 @@ router.post("/signup", async (req, res) => {
     } = req.body;
 
     const otp = await OTPModel.findOne({ email: email });
-
+    console.log(verificationCode);
     if (otp.otp != verificationCode) {
       return res.status(400).json({ error: "Invalid OTP Or Expired" });
     }

@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { deleteCart } from "../redux/cartRedux";
 import CartItemSkeleton from "../components/SkeletonsComponents/CartItemSkeleton";
 import AddressStripSkeleton from "../components/SkeletonsComponents/AddressStripSkeleton";
+import { toast } from "react-toastify";
 
 const Wrapper = styled.div`
   margin: auto;
@@ -130,6 +131,7 @@ const CartPage = () => {
         const response = await userRequest("/address/");
         setAddress(response.data);
         setAddressLoading(false);
+        console.log(response.data);
         setLoading(false);
       } catch (err) {
         console.log(`AllAddress ${err}`);
@@ -144,7 +146,7 @@ const CartPage = () => {
   };
 
   const handleCheckOut = async () => {
-    if (selectedPayment === "paypal") {
+    if (selectedPayment === "paypal" && address !== null) {
       try {
         const products = cartProducts.map((item) => ({
           productId: item._id,
@@ -167,7 +169,20 @@ const CartPage = () => {
       } catch (err) {
         console.log(err);
       }
-    } else {
+    } else if (selectedPayment !== "paypal" && address === null) {
+      toast.error("Please select a valid payment and address");
+      setCheckoutClicked(true);
+      setTimeout(() => {
+        setCheckoutClicked(false);
+      }, 1000);
+    } else if (selectedPayment !== "paypal") {
+      toast.error("Please select a valid payment method");
+      setCheckoutClicked(true);
+      setTimeout(() => {
+        setCheckoutClicked(false);
+      }, 1000);
+    } else if (address === null) {
+      toast.error("Please add a valid address");
       setCheckoutClicked(true);
       setTimeout(() => {
         setCheckoutClicked(false);
@@ -186,7 +201,7 @@ const CartPage = () => {
               <AddressStripComponent
                 setOpenAddressDialog={setOpenAddressDialog}
                 address={address}
-                className={checkoutClicked && address === {} ? "vibrate" : ""}
+                addClass={checkoutClicked && address === null ? "vibrate" : ""}
               />
             )}
             {loading ? (
@@ -208,7 +223,11 @@ const CartPage = () => {
               <PaymentSelect
                 value={selectedPayment}
                 onChange={handlePaymentChange}
-                className={checkoutClicked ? "vibrate" : ""}
+                className={
+                  checkoutClicked && selectedPayment !== "paypal"
+                    ? "vibrate"
+                    : ""
+                }
               >
                 <option value="">Select Payment Method</option>
 

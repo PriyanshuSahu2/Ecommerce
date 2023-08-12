@@ -4,7 +4,7 @@ import axios from "axios";
 import { BASE_URL } from "../requestMethod";
 
 import ProductBase from "./ProductBase";
-import SortingSection from "./SortingSection";
+// import SortingSection from "./SortingSection";
 import ProductBaseSkeleton from "./SkeletonsComponents/ProductBaseSkeleton";
 
 const Container = styled.div`
@@ -28,6 +28,7 @@ const AllProductSection = ({
     const urlParams = new URLSearchParams(window.location.search);
     const getProducts = async () => {
       try {
+        setLoading(true);
         // Construct the filter query parameters
         const categories = selectedCategories.join(",");
         const brands = selectedBrands.join(",");
@@ -70,7 +71,6 @@ const AllProductSection = ({
 
   return (
     <Container>
-      <SortingSection />
       <ProductsContainer>
         {loading ? (
           <>
