@@ -42,6 +42,9 @@ const ProductImageSliderContainer = styled.div`
   position: relative;
   width: 210px;
   height: 270px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 5px;
 `;
 const ProductInfo = styled.div`
   position: relative;

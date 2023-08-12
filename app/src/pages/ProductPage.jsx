@@ -11,6 +11,7 @@ import { IMAGE_BASE_URL, publicRequest } from "../requestMethod";
 import { FiArrowRight } from "react-icons/fi";
 import ReviewComponents from "../components/ReviewComponents";
 import Swal from "sweetalert2";
+import ProductPageSkeleton from "../components/SkeletonsComponents/ProductPageSkeleton";
 
 const Wrapper = styled.div`
   display: flex;
@@ -202,11 +203,13 @@ const ProductPage = () => {
   const [product, setProduct] = useState([]);
   const navigate = useNavigate();
   const [update, setUpdate] = useState("");
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const getProduct = async () => {
       try {
         const response = await publicRequest("products/" + productId);
         setProduct(response.data); // Access the `data` property of the response
+        setLoading(false);
       } catch (err) {
         console.log(`AllProductSection ${err}`);
       }
@@ -262,84 +265,92 @@ const ProductPage = () => {
     <>
       <Announcement />
       <HeaderComponent />
-      <Container>
-        <Wrapper className="mt-5">
-          <ProductImageGridContainer>
-            {product.img?.map((image, idx) => {
-              return (
-                <ProductImagesContainer>
-                  <ProductImage src={`${IMAGE_BASE_URL}/products/${image}`} />
-                </ProductImagesContainer>
-              );
-            })}
-          </ProductImageGridContainer>
 
-          <ProductDescriptionContainer>
-            <ProductPriceInfo>
-              <ProductBrandTitle>{product.brand}</ProductBrandTitle>
-              <ProductTitle>{product.productName}</ProductTitle>
-              <SellingPriceContainer>
-                <Price>$ {product.price}</Price>
-                <Info>inclusive of all taxes</Info>
-              </SellingPriceContainer>
-            </ProductPriceInfo>
+      {loading ? (
+        <ProductPageSkeleton />
+      ) : (
+        <Container>
+          <Wrapper className="mt-5">
+            <ProductImageGridContainer>
+              {product.img?.map((image, idx) => {
+                return (
+                  <ProductImagesContainer>
+                  
+                    <ProductImage src={`${IMAGE_BASE_URL}/products/${image}`} />
+                  </ProductImagesContainer>
+                );
+              })}
+            </ProductImageGridContainer>
 
-            <ProductSizeSelectContainer>
-              <SizeContainerHeader>
-                <Header>SELECT SIZE </Header>
-              </SizeContainerHeader>
-              <AllSizeButtonsContainer>
-                <SizeBtnContainer>
-                  {product.sizes?.map((item, idx) => {
-                    const isSelected = item === selectedSize;
+            <ProductDescriptionContainer>
+              <ProductPriceInfo>
+                <ProductBrandTitle>{product.brand}</ProductBrandTitle>
+                <ProductTitle>{product.productName}</ProductTitle>
+                <SellingPriceContainer>
+                  <Price>$ {product.price}</Price>
+                  <Info>inclusive of all taxes</Info>
+                </SellingPriceContainer>
+              </ProductPriceInfo>
 
-                    return (
-                      <SizeBtn
-                        isSelected={isSelected}
-                        key={idx}
-                        onClick={() => {
-                          SelectedSize(item);
-                        }}
-                      >
-                        <SizeLabel>{item}</SizeLabel>
-                      </SizeBtn>
-                    );
-                  })}
-                </SizeBtnContainer>
-              </AllSizeButtonsContainer>
-            </ProductSizeSelectContainer>
+              <ProductSizeSelectContainer>
+                <SizeContainerHeader>
+                  <Header>SELECT SIZE </Header>
+                </SizeContainerHeader>
+                <AllSizeButtonsContainer>
+                  <SizeBtnContainer>
+                    {product.sizes?.map((item, idx) => {
+                      const isSelected = item === selectedSize;
 
-            <div>
-              <ProductActionsContainer>
-                {!isProductInCart ? (
-                  <AddToBagBtn onClick={AddToCart}>
-                    <AddToBagIcon />
-                    <BtnLabel>Add to Cart</BtnLabel>
-                  </AddToBagBtn>
-                ) : (
-                  <GoToBagBtn to="/cart">
-                    <GoToBagIcon />
-                    <BtnLabel>Go to Cart</BtnLabel>
-                  </GoToBagBtn>
-                )}
-              </ProductActionsContainer>
-            </div>
+                      return (
+                        <SizeBtn
+                          isSelected={isSelected}
+                          key={idx}
+                          onClick={() => {
+                            SelectedSize(item);
+                          }}
+                        >
+                          <SizeLabel>{item}</SizeLabel>
+                        </SizeBtn>
+                      );
+                    })}
+                  </SizeBtnContainer>
+                </AllSizeButtonsContainer>
+              </ProductSizeSelectContainer>
 
-            <hr />
+              <div>
+                <ProductActionsContainer>
+                  {!isProductInCart ? (
+                    <AddToBagBtn onClick={AddToCart}>
+                      <AddToBagIcon />
+                      <BtnLabel>Add to Cart</BtnLabel>
+                    </AddToBagBtn>
+                  ) : (
+                    <GoToBagBtn to="/cart">
+                      <GoToBagIcon />
+                      <BtnLabel>Go to Cart</BtnLabel>
+                    </GoToBagBtn>
+                  )}
+                </ProductActionsContainer>
+              </div>
 
-            <>
-              <ProductDescriptionLabel>PRODUCT DETAILS</ProductDescriptionLabel>
-            </>
-            <hr />
-            <ReviewComponents
-              productId={productId}
-              averageRating={product?.rating}
-              setUpdate={setUpdate}
-              update={update}
-            />
-          </ProductDescriptionContainer>
-        </Wrapper>
-      </Container>
+              <hr />
+
+              <>
+                <ProductDescriptionLabel>
+                  PRODUCT DETAILS
+                </ProductDescriptionLabel>
+              </>
+              <hr />
+              <ReviewComponents
+                productId={productId}
+                averageRating={product?.rating}
+                setUpdate={setUpdate}
+                update={update}
+              />
+            </ProductDescriptionContainer>
+          </Wrapper>
+        </Container>
+      )}
     </>
   );
 };

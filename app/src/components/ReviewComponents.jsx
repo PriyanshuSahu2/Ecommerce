@@ -5,6 +5,8 @@ import { CiStar } from "react-icons/ci";
 import CustomerReviewsComponent from "./CustomerReviewsComponent";
 import { publicRequest, userRequest } from "../requestMethod";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   width: 100%;
@@ -118,7 +120,7 @@ const ReviewComponents = ({ productId, averageRating, setUpdate, update }) => {
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
   const [isTextAreaVisible, setTextAreaVisible] = useState(false);
-
+  const navigate = useNavigate();
   const handleRatingClick = (value) => {
     setRating(value);
     setTextAreaVisible(true);
@@ -133,25 +135,42 @@ const ReviewComponents = ({ productId, averageRating, setUpdate, update }) => {
     setReview("");
     setTextAreaVisible(false);
   };
-  const user = JSON.parse(localStorage.getItem("persist:root")).user;
-  const customerName = JSON.parse(user).currentUser.fullName;
+  const user = JSON.parse(localStorage.getItem("persist:root"))?.user;
+  const customerName = JSON.parse(user)?.currentUser?.fullName;
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     console.log(customerName);
     // Perform submit logic here
-    try {
-      const res = await userRequest.post("reviews/", {
-        customerName: customerName,
-        rating: rating,
-        review: review,
-        productId: productId,
+    if (customerName) {
+      try {
+        const res = await userRequest.post("reviews/", {
+          customerName: customerName,
+          rating: rating,
+          review: review,
+          productId: productId,
+        });
+        toast.success("Review Added Successfully");
+        setUpdate(res);
+        handleCancelClick();
+      } catch (error) {
+        console.log(error);
+        toast.error(error.response.data.error);
+      }
+    } else {
+      Swal.fire({
+        icon: "question",
+        title: "Do you want to Login?",
+        text: "Please Login First to Continue!!",
+        iconColor: "#ff3f6c",
+        confirmButtonColor: "#ff3f6c",
+        cancelButtonColor: "black",
+        showCancelButton: true,
+        confirmButtonText: "Login",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/auth");
+        }
       });
-      toast.success("Review Added Successfully");
-      setUpdate(res);
-      handleCancelClick();
-    } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.error);
     }
   };
 

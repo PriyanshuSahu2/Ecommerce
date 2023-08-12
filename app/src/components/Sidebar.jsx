@@ -1,7 +1,7 @@
 import React from "react";
 
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { FiLogOut } from "react-icons/fi";
 import Swal from "sweetalert2";
@@ -47,7 +47,18 @@ const SidebarItem = styled(Link)`
     border-radius: 5px;
   }
 `;
-
+const SidebarItemSpan = styled.span`
+  font-size: 16px;
+  text-decoration: none;
+  color: #000000;
+  font-weight: 500;
+  margin-bottom: 8px; /* Reduced margin for items */
+  padding: 8px 0; /* Added padding for better spacing */
+  &:hover {
+    background-color: #f2f2f2;
+    border-radius: 5px;
+  }
+`;
 const LogoutBtn = styled.button`
   font-weight: 700;
   cursor: pointer;
@@ -97,6 +108,27 @@ const Sidebar = ({ showSidebar }) => {
 
     navigate("/auth");
   };
+  const handleClick = async (to) => {
+    if (!id) {
+      await Swal.fire({
+        icon: "question",
+        title: "Do you want to Login?",
+        text: "Please Login First to Continue!!",
+        iconColor: "#ff3f6c",
+        confirmButtonColor: "#ff3f6c",
+        cancelButtonColor: "black",
+        showCancelButton: true,
+        confirmButtonText: "Login",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/auth");
+        }
+      });
+    } else {
+
+      navigate(to);
+    }
+  };
   return (
     <SidebarContainer className="p-0" open={showSidebar}>
       <h3
@@ -111,17 +143,36 @@ const Sidebar = ({ showSidebar }) => {
       <div className="px-5 text-left d-flex flex-column">
         <SidebarItem to="/">Home</SidebarItem>
         <SidebarItem to="/allProducts">Products</SidebarItem>
-        <SidebarItem to="/">Cart</SidebarItem>
-        <SidebarItem to={"/user/" + id}>User Profile</SidebarItem>
-        <SidebarItem to={"/orders/" + id}>Orders</SidebarItem>
+        <SidebarItemSpan
+          onClick={() => {
+            handleClick("/cart");
+          }}
+        >
+          Cart
+        </SidebarItemSpan>
+        <SidebarItemSpan
+          onClick={() => {
+            handleClick("/user/" + id);
+          }}
+        >
+          User Profile
+        </SidebarItemSpan>
+        <SidebarItemSpan
+          onClick={() => {
+            handleClick("/orders/" + id);
+          }}
+        >
+          Orders
+        </SidebarItemSpan>
       </div>
-      <SidebarHeading>Mens Categories</SidebarHeading>
+      <SidebarHeading>Categories</SidebarHeading>
       <div className="px-5 text-left d-flex flex-column">
         <SidebarItem to="/allProducts?Categories=TShirt">T-Shirt</SidebarItem>
         <SidebarItem to="/allProducts?Categories=Shirt">Shirt</SidebarItem>
         <SidebarItem to="/allProducts?Categories=Pants">Pants</SidebarItem>
         <SidebarItem to="/allProducts?Categories=Shoes">Shoes</SidebarItem>
         <SidebarItem to="/allProducts?Categories=Jeans">Jeans</SidebarItem>
+        <SidebarItem to="/allProducts?Categories=Skirt">Skirt</SidebarItem>
       </div>
       <LogoutBtn onClick={handleLogOut}>
         <LogoutIcon />

@@ -8,11 +8,14 @@ import "@fortawesome/react-fontawesome";
 import SearchCommponent from "./SearchCommponent";
 import { HiMiniBars3BottomLeft } from "react-icons/hi2";
 import { PiHandbagLight } from "react-icons/pi";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { useRef } from "react";
 import { RiAdminLine } from "react-icons/ri";
+import { logout } from "../redux/userRedux";
+import { removeCart } from "../redux/cartRedux";
+import Swal from "sweetalert2";
 const Header = styled.header`
   width: 100%;
   border-bottom: 1px solid #ff3e6c;
@@ -130,7 +133,21 @@ const HeaderComponent = () => {
   }, []);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const handleLogOut = async () => {
+    if (currentUser) {
+      dispatch(logout());
+      dispatch(removeCart());
+      localStorage.clear();
+      await Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Logout Successful",
+      });
+    }
+    navigate("/auth");
+  };
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
@@ -164,13 +181,17 @@ const HeaderComponent = () => {
 
             {currentUser ? (
               <Dropdown isOpen={isDropdownOpen}>
-                <DropdownItem to={"/profile"}>Profile</DropdownItem>
-                <DropdownItem to={"/admin"}>Admin</DropdownItem>
-                <DropdownItem>Logout</DropdownItem>
+                <DropdownItem to={"/user/" + currentUser?._id}>
+                  Profile
+                </DropdownItem>
+                {currentUser.isAdmin && (
+                  <DropdownItem to={"/admin"}>Admin</DropdownItem>
+                )}
+                <DropdownItem onClick={handleLogOut}>Logout</DropdownItem>
               </Dropdown>
             ) : (
               <Dropdown isOpen={isDropdownOpen}>
-                <DropdownItem>Login</DropdownItem>
+                <DropdownItem to={"/auth"}>Login</DropdownItem>
               </Dropdown>
             )}
           </Right>
