@@ -17,7 +17,6 @@ const ProductSchema = new mongoose.Schema({
   },
   desc: {
     type: String,
- 
   },
   rating: {
     type: Number,
@@ -33,5 +32,11 @@ const ProductSchema = new mongoose.Schema({
   },
 });
 
-ProductSchema.index({ productName: "text", desc: "text" });
+ProductSchema.index({
+  productName: "text",
+  desc: "text",
+  categories: "text",
+  brand: "text",
+  price: "text",
+});
 mongoose.model("ProductModel", ProductSchema);
