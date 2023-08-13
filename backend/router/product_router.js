@@ -17,18 +17,14 @@ router.post("/", verifyTokenAndAdmin, async (req, res) => {
   }
 });
 
-router.post(
-  "/upload",
-  getUploadMiddleware("images/products").array("images"),
-  (req, res) => {
-    if (req.files && req.files.length > 0) {
-      const fileNames = req.files?.map((file) => file.filename);
-      res.json({ success: true, fileNames });
-    } else {
-      res.json({ success: false });
-    }
+router.post("/upload", getUploadMiddleware().array("images"), (req, res) => {
+  if (req.files && req.files.length > 0) {
+    const fileNames = req.files?.map((file) => file.path);
+    res.json({ success: true, fileNames });
+  } else {
+    res.json({ success: false });
   }
-);
+});
 router.get("/top", async (req, res) => {
   try {
     const salesByProducts = await Order.aggregate([

@@ -7,11 +7,12 @@ import { BsFillBagPlusFill } from "react-icons/bs";
 import { addCartProduct } from "../redux/cartRedux";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { IMAGE_BASE_URL, publicRequest } from "../requestMethod";
+import { publicRequest } from "../requestMethod";
 import { FiArrowRight } from "react-icons/fi";
 import ReviewComponents from "../components/ReviewComponents";
 import Swal from "sweetalert2";
 import ProductPageSkeleton from "../components/SkeletonsComponents/ProductPageSkeleton";
+import LoadingClip from "../components/Loadings/LoadingClip";
 
 const Wrapper = styled.div`
   display: flex;
@@ -204,6 +205,7 @@ const ProductPage = () => {
   const navigate = useNavigate();
   const [update, setUpdate] = useState("");
   const [loading, setLoading] = useState(true);
+  const [cartBtnLoading, setCartBtnLoading] = useState(false);
   useEffect(() => {
     const getProduct = async () => {
       try {
@@ -230,7 +232,8 @@ const ProductPage = () => {
   const currentUser = useSelector((state) => state?.user?.currentUser);
   const AddToCart = async () => {
     if (currentUser) {
-      dispatch(
+      setCartBtnLoading(true);
+      await dispatch(
         addCartProduct({
           products: [
             {
@@ -243,6 +246,7 @@ const ProductPage = () => {
       ).then((data) => {
         console.log(data);
       });
+      setCartBtnLoading(false);
     } else {
       Swal.fire({
         icon: "question",
@@ -275,7 +279,7 @@ const ProductPage = () => {
               {product.img?.map((image, idx) => {
                 return (
                   <ProductImagesContainer>
-                    <ProductImage src={`${IMAGE_BASE_URL}/products/${image}`} />
+                    <ProductImage src={image} />
                   </ProductImagesContainer>
                 );
               })}
@@ -320,8 +324,14 @@ const ProductPage = () => {
                 <ProductActionsContainer>
                   {!isProductInCart ? (
                     <AddToBagBtn onClick={AddToCart}>
-                      <AddToBagIcon />
-                      <BtnLabel>Add to Cart</BtnLabel>
+                      {cartBtnLoading ? (
+                        <LoadingClip />
+                      ) : (
+                        <>
+                          <AddToBagIcon />
+                          <BtnLabel>Add to Cart</BtnLabel>
+                        </>
+                      )}
                     </AddToBagBtn>
                   ) : (
                     <GoToBagBtn to="/cart">

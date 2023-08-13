@@ -39,7 +39,7 @@ app.use(express.urlencoded({ limit: "10mb", extended: true }));
 mongoose
   .connect(process.env.MONGODB_URL)
   .then(() => console.log("DB Connected "))
-  .catch((err) => console.log("Error On mongose ,connenction " + err));
+  .catch((err) => console.log("Error On mongoose ,connection " + err));
 
 app.get("/api/keys/paypal", (req, res) => {
   res.send(process.env.PAYPAL_CLIENT_ID || "sb");

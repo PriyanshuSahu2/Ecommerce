@@ -1,7 +1,8 @@
 import axios from "axios";
 
 export const BASE_URL = "https://markethub-backend.onrender.com/api";
-export const IMAGE_BASE_URL = "https://markethub-backend.onrender.com/images";
+// export const BASE_URL = "http://localhost:5000/api";
+
 export const publicRequest = axios.create({
   baseURL: BASE_URL,
 });

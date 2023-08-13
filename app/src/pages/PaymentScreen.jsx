@@ -137,7 +137,7 @@ const PaymentScreen = () => {
           </SummaryItem>
           <SummaryItem>
             <SummaryItemText>Shipping Discount</SummaryItemText>
-            <SummaryItemPrice>Rs -40</SummaryItemPrice>
+            <SummaryItemPrice>$ -40</SummaryItemPrice>
           </SummaryItem>
           <SummaryItem>
             <SummaryItemText>Total</SummaryItemText>

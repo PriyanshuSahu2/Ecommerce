@@ -7,6 +7,7 @@ import { userRequest } from "../requestMethod";
 import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+import LoadingClip from "../components/Loadings/LoadingClip";
 
 const Wrapper = styled.div`
   max-width: 980px;
@@ -158,13 +159,13 @@ const OrderScreen = () => {
   useEffect(() => {
     const getOrder = async () => {
       const response = await userRequest(`/orders/${id}`);
-      console.log(response.data);
+
       setOrder(response.data);
       setPaymentStatus(response.data.payment_status);
     };
     getOrder();
   }, [paymentStatus, id]);
-  console.log(order.status);
+
   return (
     <>
       <HeaderComponent />
@@ -235,7 +236,7 @@ const OrderScreen = () => {
               </SummaryItem>
               <SummaryItem>
                 <SummaryItemText>Shipping Discount</SummaryItemText>
-                <SummaryItemPrice>Rs -40</SummaryItemPrice>
+                <SummaryItemPrice>$ -40</SummaryItemPrice>
               </SummaryItem>
               <Hr />
               <SummaryItem type="total">
@@ -243,13 +244,16 @@ const OrderScreen = () => {
                 <SummaryItemPrice>$ {order.total_amount}</SummaryItemPrice>
               </SummaryItem>
               {/* <Button>CHECKOUT NOW</Button> */}
-              {paymentStatus === "Pending" && (
-                <PayPalButtons
-                  createOrder={createOrder}
-                  onApprove={onApprove}
-                  onError={onError}
-                />
-              )}
+              {paymentStatus === "Pending" &&
+                (isPending ? (
+                  <LoadingClip />
+                ) : (
+                  <PayPalButtons
+                    createOrder={createOrder}
+                    onApprove={onApprove}
+                    onError={onError}
+                  />
+                ))}
             </Summary>
           </OrderSummaryContainer>
         </Wrapper>

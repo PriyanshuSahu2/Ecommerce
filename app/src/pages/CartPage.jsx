@@ -213,7 +213,9 @@ const CartPage = () => {
               </>
             ) : (
               cartProducts?.map((item) => {
-                return <CartItem data={item} />;
+                return (
+                  <CartItem data={item} key={item._id + item.selectedSize} />
+                );
               })
             )}
           </ItemSectionContainer>
@@ -246,7 +248,7 @@ const CartPage = () => {
               </SummaryItem>
               <SummaryItem>
                 <SummaryItemText>Shipping Discount</SummaryItemText>
-                <SummaryItemPrice>Rs -40</SummaryItemPrice>
+                <SummaryItemPrice>$ -40</SummaryItemPrice>
               </SummaryItem>
               <Hr />
               <SummaryItem type="total">

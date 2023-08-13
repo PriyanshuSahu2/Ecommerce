@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Modal from "react-modal";
-import { IMAGE_BASE_URL, publicRequest } from "../../requestMethod";
+import { publicRequest } from "../../requestMethod";
 
 const AddProductModalContainer = styled.div`
   display: flex;
@@ -227,10 +227,7 @@ const EditProductModal = ({
               {image?.toString().includes("data") ? (
                 <ImagePreview src={image} alt={`Product ${index + 1}`} />
               ) : (
-                <ImagePreview
-                  src={`${IMAGE_BASE_URL}/products/${image}`}
-                  alt={`Product ${index + 1}`}
-                />
+                <ImagePreview src={image} alt={`Product ${index + 1}`} />
               )}
               <DeleteButton
                 visible={hoveredIndex === index}

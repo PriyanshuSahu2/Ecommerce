@@ -2,7 +2,7 @@ import React from "react";
 import { styled } from "styled-components";
 import { TiStarFullOutline } from "react-icons/ti";
 import { Link } from "react-router-dom";
-import { IMAGE_BASE_URL } from "../requestMethod";
+
 const Container = styled.div`
   width: 210px;
   text-align: left;
@@ -127,7 +127,7 @@ const ProductBase = ({ data }) => {
         </ProductRatingContainer>
         <div>
           <ProductImageSliderContainer>
-            <ProductImage src={`${IMAGE_BASE_URL}/products/${data?.img[0]}`} />
+            <ProductImage src={data?.img[0]} />
           </ProductImageSliderContainer>
           <ProductInfo>
             <ProductBrand>{data?.brand}</ProductBrand>

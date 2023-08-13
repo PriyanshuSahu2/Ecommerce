@@ -5,7 +5,7 @@ import { AiFillDelete } from "react-icons/ai";
 import DialogBox from "./DialogBox";
 import { useDispatch } from "react-redux";
 import { deleteCartItem } from "../redux/cartRedux";
-import { IMAGE_BASE_URL } from "../requestMethod";
+
 
 const Container = styled.div`
   margin-bottom: 8px;
@@ -127,7 +127,7 @@ const CartItem = ({ data, interactable = true }) => {
       <Left>
         {/* <a href=""> */}
         <ProductImageSliderContainer>
-          <ProductImage src={`${IMAGE_BASE_URL}/products/${data?.img[0]}`} />
+          <ProductImage src={`${data?.img[0]}`} />
         </ProductImageSliderContainer>
         {/* </a> */}
       </Left>

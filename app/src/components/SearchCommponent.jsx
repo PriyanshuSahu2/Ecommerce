@@ -7,13 +7,11 @@ const Container = styled.div`
   display: flex;
   border: 1px solid black;
   margin-right: 30px;
-  border: ${(props) =>
-    props.isFocused ? "1px solid #9595a081" : "none"};
+  border: ${(props) => (props.isFocused ? "1px solid #9595a081" : "none")};
   border-radius: 5px;
   max-width: 300px;
   width: 300px;
-  background-color: ${(props) =>
-    props.isFocused ? "#FFFFF" : "#f5f5f6"};
+  background-color: ${(props) => (props.isFocused ? "#FFFFF" : "#f5f5f6")};
 `;
 
 const InputField = styled.input`

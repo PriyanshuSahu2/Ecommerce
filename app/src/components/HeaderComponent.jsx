@@ -146,6 +146,7 @@ const HeaderComponent = () => {
         text: "Logout Successful",
       });
     }
+    
     navigate("/auth");
   };
   const toggleDropdown = () => {

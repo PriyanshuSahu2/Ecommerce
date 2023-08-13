@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { TbEdit } from "react-icons/tb";
 import { RiDeleteBack2Line } from "react-icons/ri";
 import {
-  IMAGE_BASE_URL,
+
   publicRequest,
   userRequest,
 } from "../../requestMethod";
@@ -232,10 +232,7 @@ const ProductCard = ({ product, setUpdateItem }) => {
           >
             {product?.img.map((image, index) => (
               <div key={index}>
-                <ProductImage
-                  src={`${IMAGE_BASE_URL}/products/${image}`}
-                  alt={`Product ${index + 1}`}
-                />
+                <ProductImage src={image} alt={`Product ${index + 1}`} />
               </div>
             ))}
           </Carousel>
