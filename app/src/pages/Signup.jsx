@@ -105,7 +105,7 @@ const Signup = ({ handleToggle }) => {
   const [loading, setLoading] = useState(false);
   const [verificationLoading, setVerificationLoading] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState(false);
-  const navigate = useNavigate();
+
   const handleSignup = async (e) => {
     e.preventDefault();
     if (loading) return;
@@ -139,7 +139,15 @@ const Signup = ({ handleToggle }) => {
         title: "success",
         text: res.data.message,
       });
-      navigate("/auth");
+      setFormData({
+        name: "",
+        verificationCode: "",
+        email: "",
+        mobileNumber: "",
+        password: "",
+        confirmPassword: "",
+      });
+      handleToggle();
     } catch (error) {
       console.log("error", error);
       Swal.fire({

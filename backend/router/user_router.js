@@ -21,7 +21,7 @@ const generateOTP = () => {
 
 const OTPs = {};
 
-console.log(process.env.GMAIL);
+
 // Nodemailer configuration
 const transporter = nodemailer.createTransport({
   service: "Gmail", // e.g., 'Gmail'
@@ -191,8 +191,9 @@ router.post("/reset-password", async (req, res) => {
       return res.status(400).json({ error: "User Not Found" });
     }
 
-    const otp = OTPModel.findOne({ email: email });
-    if (otp.otp !== verificationCode) {
+    const otp = await OTPModel.findOne({ email: email });
+    console.log(verificationCode);
+    if (otp.otp != verificationCode) {
       return res.status(400).json({ error: "Invalid OTP Or Expired" });
     }
 

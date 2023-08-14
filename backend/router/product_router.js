@@ -25,6 +25,36 @@ router.post("/upload", getUploadMiddleware().array("images"), (req, res) => {
     res.json({ success: false });
   }
 });
+
+//get All Products
+router.get("/", (req, res) => {
+  const categoriesParam = req.query.Categories;
+  const brandParam = req.query.Brand;
+  const searchQuery = req.query.search;
+  const categories = categoriesParam ? categoriesParam.split(",") : [];
+  const brands = brandParam ? brandParam.split(",") : [];
+  const filter = {};
+
+  if (categories.length > 0) {
+    // Add a filter for categories
+    filter.categories = { $in: categories };
+  }
+  if (brands.length > 0) {
+    // Add a filter for brands
+    filter.brand = { $in: brands };
+  }
+  if (searchQuery) {
+    filter.$text = { $search: searchQuery };
+  }
+  ProductModel.find(filter)
+    .then((products) => {
+      res.status(200).json(products.reverse());
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
 router.get("/top", async (req, res) => {
   try {
     const salesByProducts = await Order.aggregate([
@@ -57,59 +87,9 @@ router.get("/top", async (req, res) => {
         model: "ProductModel", // Specify the model name of the referenced collection
       },
     ]);
-    console.log(result);
+
     res.status(200).json(result);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-//get All Products
-router.get("/", async (req, res) => {
-  // Extract query parameters from the request
-  const searchQuery = req.query.searchQuery;
-  const categories = req.query.category;
-  const brands = req.query.brand;
-
-  try {
-    // Initialize an empty query object to build the MongoDB query
-    let query = {};
-
-    // Check if a search query parameter is provided
-    if (searchQuery) {
-      // Build a text search query using the provided search query
-      query.$text = { $search: searchQuery };
-    }
-
-    // Check if brand filter parameters are provided
-    if (brands) {
-      // Create a regex pattern for each brand and match case-insensitively
-      query.brandName = { $in: brands.map((brand) => new RegExp(brand, "i")) };
-    }
-
-    // Check if category filter parameters are provided
-    if (categories) {
-      // Create a regex pattern for each category and match case-insensitively
-      query.category = {
-        $in: categories.map((category) => new RegExp(category, "i")),
-      };
-    }
-
-    let products;
-
-    // Check if there are any query parameters
-    if (Object.keys(query).length === 0) {
-      // If no query parameters, return all products
-      products = await ProductModel.find();
-    } else {
-      // Otherwise, perform the search with filters
-      products = await ProductModel.find(query);
-    }
-
-    // Respond with the fetched products in JSON format
-    res.status(200).json(products);
-  } catch (error) {
-    // Handle errors by logging them and sending an internal server error response
     console.log(error);
     res.status(500).json({ error: "Internal server error" });
   }

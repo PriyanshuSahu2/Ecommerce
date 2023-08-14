@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
 import styled from "styled-components";
-import { login } from "../redux/userRedux";
-import { Button, Form, Image } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import { BsQuestionDiamond } from "react-icons/bs";
 import LoadingBar from "../components/Loadings/LoadingBar";
 import HeaderComponent from "../components/HeaderComponent";
 import { publicRequest } from "../requestMethod";
 import LoadingClip from "../components/Loadings/LoadingClip";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
@@ -110,7 +109,7 @@ const VerificationSpan = styled.span`
 const VerificationMessage = styled.p`
   color: #0ca9f1;
 `;
-const ForgotPassword = ({ handleToggle }) => {
+const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -118,15 +117,8 @@ const ForgotPassword = ({ handleToggle }) => {
   const [verificationStatus, setVerificationStatus] = useState(false);
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
-  const dispatch = useDispatch();
-  const handleLogin = async (e) => {
-    setLoading(true);
-    e.preventDefault();
 
-    setLoading(false);
-  };
   const handleGetVerificationCode = async () => {
-
     setVerificationLoading(true);
     try {
       const res = await publicRequest.post("/user/send-otp", {
@@ -157,8 +149,9 @@ const ForgotPassword = ({ handleToggle }) => {
         title: "Reset Successful",
         text: res.data.message,
       });
+      handleToggle();
     } catch (error) {
-      console.log(error)
+      console.log(error);
       Swal.fire({
         icon: "success",
         title: "Reset Failed",
@@ -166,7 +159,10 @@ const ForgotPassword = ({ handleToggle }) => {
       });
     }
   };
-
+  const navigate = useNavigate();
+  const handleToggle = () => {
+    navigate("/auth", { replace: true });
+  };
   return (
     <Container>
       <HeaderComponent />
@@ -223,8 +219,8 @@ const ForgotPassword = ({ handleToggle }) => {
               </SubmitButton>
             </div>
             <LoginLink>
-              Don't have an account?{" "}
-              <span onClick={handleToggle}>Register</span>
+              Did You Remember Your Password?{" "}
+              <span onClick={handleToggle}>Login</span>
             </LoginLink>
           </CustomForm>
         </Right>

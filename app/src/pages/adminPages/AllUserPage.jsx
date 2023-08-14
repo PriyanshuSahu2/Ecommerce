@@ -49,10 +49,49 @@ const FieldHeaderContainer = styled.div`
   background-color: #000000;
   border-radius: 5px;
 `;
+const PaginationControls = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+`;
 
+const PaginationButtons = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const PaginationButton = styled.button`
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  background-color: ${(props) => (props.isActive ? "#ff3e6c" : "white")};
+  color: ${(props) => (props.isActive ? "white" : "#333")};
+  cursor: pointer;
+`;
+const PageNumber = styled.span`
+  color: #666;
+`;
 const AllUserPage = () => {
   const [users, setUsers] = useState([]);
-  const [update,setUpdate] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [update, setUpdate] = useState("");
+  const itemsPerPage = 10;
+
+  //pagination
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentUsers = users.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+  const pageNumbers = [];
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i);
+  }
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   useEffect(() => {
     const getAllUsers = async () => {
       try {
@@ -83,10 +122,38 @@ const AllUserPage = () => {
             <FieldHeader>Edit/Delete</FieldHeader>
           </FieldHeaderContainer>
           <UsersContainer>
-            {users.map((user) => (
-              <UserCard key={user._id} user={user} setUpdate={setUpdate}/>
+            {currentUsers.map((user) => (
+              <UserCard key={user._id} user={user} setUpdate={setUpdate} />
             ))}
           </UsersContainer>
+          <PaginationControls>
+            <PaginationButtons>
+              <PaginationButton
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </PaginationButton>
+              {pageNumbers.map((number) => (
+                <PaginationButton
+                  key={number}
+                  onClick={() => handlePageChange(number)}
+                  isActive={number === currentPage}
+                >
+                  {number}
+                </PaginationButton>
+              ))}
+              <PaginationButton
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </PaginationButton>
+            </PaginationButtons>
+            <PageNumber>
+              Page {currentPage} of {totalPages}
+            </PageNumber>
+          </PaginationControls>
         </Right>
       </Wrapper>
     </Container>

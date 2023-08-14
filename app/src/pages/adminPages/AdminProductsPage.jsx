@@ -6,6 +6,8 @@ import { MdLibraryAdd } from "react-icons/md";
 import { publicRequest, userRequest } from "../../requestMethod";
 import AddProductModal from "../../components/adminComponents/AddProductModal";
 import SidebarComponents from "../../components/adminComponents/SidebarComponents";
+import AdminProductCard from "../../components/SkeletonsComponents/AdminProductCard";
+import { toast } from "react-toastify";
 
 const Container = styled.div`
   width: 100%;
@@ -18,7 +20,9 @@ const Wrapper = styled.div`
   width: 960px;
   display: flex;
 `;
+
 const Left = styled.div``;
+
 const Right = styled.div`
   margin-left: 20px;
 `;
@@ -43,16 +47,50 @@ const AddProductButton = styled.button`
   align-items: center;
   padding: 8px 15px;
 `;
+const PaginationControls = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+`;
+
+const PaginationButtons = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const PaginationButton = styled.button`
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  background-color: ${(props) => (props.isActive ? "#ff3e6c" : "white")};
+  color: ${(props) => (props.isActive ? "white" : "#333")};
+  cursor: pointer;
+`;
+const PageNumber = styled.span`
+  color: #666;
+`;
 
 const AdminProductsPage = () => {
   const [products, setProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [updateItem, setUpdateItem] = useState("");
+  const itemsPerPage = 3;
+  const [loading, setLoading] = useState(false);
+  //pagination
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentProducts = products.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const pageNumbers = [];
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i);
+  }
   useEffect(() => {
     const getAllProducts = async () => {
       try {
         const response = await publicRequest("/products");
-        console.log(response.data);
         setProducts(response.data);
       } catch (err) {
         console.log(`AllProductSection ${err}`);
@@ -86,24 +124,26 @@ const AdminProductsPage = () => {
       // Handle the error here
     }
   };
-
   const addProduct = async (data) => {
-    const images = await uploadProductImages(data.images);
-    const newProduct = {
-      ...data,
-      img: images,
-    };
+    setLoading(true);
+
     try {
+      const images = await uploadProductImages(data.images);
+      const newProduct = {
+        ...data,
+        img: images,
+      };
       const res = await userRequest.post("/products", newProduct);
       setUpdateItem(res.data);
+      setLoading(false);
+      toast.success("Product added Successfully");
     } catch (error) {
       console.log(error);
+      setLoading(false);
+      toast.error("Something went wrong");
     }
   };
 
-  const addModalOpenClose = () => {
-    setAddModalOpen(!addModalOpen);
-  };
   return (
     <Container>
       <HeaderComponent />
@@ -114,24 +154,53 @@ const AdminProductsPage = () => {
         <Right>
           <Heading>
             All Products
-            <AddProductButton onClick={addModalOpenClose}>
+            <AddProductButton onClick={() => setAddModalOpen(true)}>
               <MdLibraryAdd />
               Add a Product
             </AddProductButton>
           </Heading>
           <AddProductModal
             isOpen={addModalOpen}
-            onRequestClose={addModalOpenClose}
+            onRequestClose={() => setAddModalOpen(false)}
             onAddProduct={addProduct}
+            setLoading={setLoading}
           />
-
-          {products.map((product) => (
+          {loading && <AdminProductCard />}
+          {currentProducts.map((product) => (
             <ProductCard
               key={product.productId}
               product={product}
               setUpdateItem={setUpdateItem}
             />
           ))}
+          <PaginationControls>
+            <PaginationButtons>
+              <PaginationButton
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </PaginationButton>
+              {pageNumbers.map((number) => (
+                <PaginationButton
+                  key={number}
+                  onClick={() => setCurrentPage(number)}
+                  isActive={number === currentPage}
+                >
+                  {number}
+                </PaginationButton>
+              ))}
+              <PaginationButton
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </PaginationButton>
+            </PaginationButtons>
+            <PageNumber>
+              Page {currentPage} of {totalPages}
+            </PageNumber>
+          </PaginationControls>
         </Right>
       </Wrapper>
     </Container>

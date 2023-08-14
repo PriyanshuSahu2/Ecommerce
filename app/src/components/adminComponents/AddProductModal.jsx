@@ -6,6 +6,7 @@ import { publicRequest } from "../../requestMethod";
 const AddProductModalContainer = styled.div`
   display: flex;
   flex-direction: column;
+  z-index: 99;
 `;
 
 const ModalHeading = styled.h2`
@@ -97,12 +98,13 @@ const InStockCheckbox = styled.input`
 const customModalStyles = {
   content: {
     top: "50%",
-    left: "50%",
+    left: "60%",
     right: "auto",
     bottom: "auto",
     transform: "translate(-50%, -50%)",
     padding: "20px",
     width: "500px", // Adjust the width as needed
+    
   },
 };
 
@@ -114,7 +116,9 @@ const AddProductModal = ({ isOpen, onRequestClose, onAddProduct }) => {
     images: [],
     sizes: [],
     categories: [],
+    desc: "",
     inStock: true,
+    zIndex: 100,
   });
 
   const handleInputChange = (e) => {
@@ -150,7 +154,6 @@ const AddProductModal = ({ isOpen, onRequestClose, onAddProduct }) => {
   };
 
   const handleAddProduct = () => {
- 
     onAddProduct(productData);
     setProductData({
       brand: "",
@@ -159,6 +162,7 @@ const AddProductModal = ({ isOpen, onRequestClose, onAddProduct }) => {
       images: [],
       categories: [],
       sizes: [],
+      desc: "",
       inStock: true,
     });
     onRequestClose();
@@ -187,10 +191,10 @@ const AddProductModal = ({ isOpen, onRequestClose, onAddProduct }) => {
       onRequestClose={onRequestClose}
       contentLabel="Add Product Modal"
       style={customModalStyles}
+      
     >
       <AddProductModalContainer>
         <ModalHeading>Add Product</ModalHeading>
-
         <ImageContainer>
           {productData.images.map((image, index) => (
             <ImagePreview
@@ -218,8 +222,10 @@ const AddProductModal = ({ isOpen, onRequestClose, onAddProduct }) => {
           placeholder="Brand"
         >
           <BrandOption value="">Select a Brand</BrandOption>
-          {brands.map((brand) => (
-            <BrandOption value={brand}>{brand}</BrandOption>
+          {brands?.map((brand, index) => (
+            <BrandOption value={brand} key={brand + index}>
+              {brand}
+            </BrandOption>
           ))}
           {/* Add more brand options as needed */}
         </BrandDropdown>
@@ -231,8 +237,10 @@ const AddProductModal = ({ isOpen, onRequestClose, onAddProduct }) => {
           placeholder="Category"
         >
           <BrandOption value="">Select a Category</BrandOption>
-          {categories.map((category) => (
-            <BrandOption value={category}>{category}</BrandOption>
+          {categories?.map((category, index) => (
+            <BrandOption value={category} key={category + index}>
+              {category}
+            </BrandOption>
           ))}
           {/* Add more brand options as needed */}
         </BrandDropdown>
@@ -256,6 +264,13 @@ const AddProductModal = ({ isOpen, onRequestClose, onAddProduct }) => {
           value={productData.sizes}
           onChange={handleInputChange}
           placeholder="Available Sizes (comma separated) (e.g. S,M,L)"
+        />
+        <ModalInput
+          type="text"
+          name="desc"
+          value={productData.desc}
+          onChange={handleInputChange}
+          placeholder="Products Description"
         />
         <InStockLabel>
           <InStockCheckbox

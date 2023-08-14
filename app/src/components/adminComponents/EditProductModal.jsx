@@ -109,7 +109,7 @@ const DeleteButton = styled.button`
 const customModalStyles = {
   content: {
     top: "50%",
-    left: "50%",
+    left: "60%",
     right: "auto",
     bottom: "auto",
     transform: "translate(-50%, -50%)",
@@ -131,6 +131,7 @@ const EditProductModal = ({
     images: product.img,
     sizes: product.sizes,
     categories: product.categories,
+    desc: product.desc,
     inStock: product.inStock,
   });
 
@@ -256,7 +257,7 @@ const EditProductModal = ({
           placeholder="Brand"
         >
           <BrandOption value="">Select a Brand</BrandOption>
-          {brands.map((brand) => (
+          {brands?.map((brand) => (
             <BrandOption value={brand}>{brand}</BrandOption>
           ))}
           {/* Add more brand options as needed */}
@@ -269,7 +270,7 @@ const EditProductModal = ({
           placeholder="Category"
         >
           <BrandOption value="">Select a Category</BrandOption>
-          {categories.map((category) => (
+          {categories?.map((category) => (
             <BrandOption value={category}>{category}</BrandOption>
           ))}
           {/* Add more brand options as needed */}
@@ -294,6 +295,13 @@ const EditProductModal = ({
           value={productData.sizes}
           onChange={handleInputChange}
           placeholder="Available Sizes (comma separated) (e.g. S,M,L)"
+        />
+        <ModalInput
+          type="text"
+          name="desc"
+          value={productData.desc}
+          onChange={handleInputChange}
+          placeholder="Products Description"
         />
         <InStockLabel>
           <InStockCheckbox

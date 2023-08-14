@@ -96,7 +96,7 @@ const FilterSection = ({
       <CategoryContainer>
         <FilterHeader>CATEGORIES</FilterHeader>
         <CategoriesList>
-          {categories.map((item, idx) => (
+          {categories?.map((item, idx) => (
             <Filter
               key={idx}
               Label={item}
@@ -112,7 +112,7 @@ const FilterSection = ({
       <CategoryContainer>
         <FilterHeader>BRAND</FilterHeader>
         <CategoriesList>
-          {brands.map((item, idx) => (
+          {brands?.map((item, idx) => (
             <Filter
               key={idx}
               Label={item}

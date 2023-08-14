@@ -18,7 +18,10 @@ router.post("/add", verifyTokenAndAdmin, async (req, res) => {
 router.get("/", (req, res) => {
   CategoriesModel.find()
     .then((Categories) => {
-      res.status(200).json(Categories[0].categories);
+      if(Categories === null){
+        res.status(400).json("Not Found")
+      }
+      res.status(200).json(Categories[0]?.categories);
     })
     .catch((error) => {
       console.log(error);

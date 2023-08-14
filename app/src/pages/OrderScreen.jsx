@@ -159,7 +159,6 @@ const OrderScreen = () => {
   useEffect(() => {
     const getOrder = async () => {
       const response = await userRequest(`/orders/${id}`);
-
       setOrder(response.data);
       setPaymentStatus(response.data.payment_status);
     };
@@ -244,7 +243,7 @@ const OrderScreen = () => {
                 <SummaryItemPrice>$ {order.total_amount}</SummaryItemPrice>
               </SummaryItem>
               {/* <Button>CHECKOUT NOW</Button> */}
-              {paymentStatus === "Pending" &&
+              {paymentStatus === "Pending" && order.total_amount &&
                 (isPending ? (
                   <LoadingClip />
                 ) : (

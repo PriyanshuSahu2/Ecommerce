@@ -92,7 +92,7 @@ router.get("/", verifyToken, async (req, res) => {
     const productDetails = await Promise.all(
       cartProducts.map(async (product) => {
         const { productId, selectedSize, quantity } = product;
-        console.log(productId);
+        
         const productData = await ProductModel.findOne({ _id: productId });
 
         if (!productData) {
@@ -100,7 +100,7 @@ router.get("/", verifyToken, async (req, res) => {
           return null;
           res.status(200).json({ message: "Product not found" });
         }
-        console.log(productData);
+        
         const { _id } = product;
         return { ...productData._doc, selectedSize, quantity, cartId: _id };
       })

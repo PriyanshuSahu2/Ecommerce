@@ -146,6 +146,14 @@ const CartPage = () => {
   };
 
   const handleCheckOut = async () => {
+    if (cartProducts.length === 0) {
+      toast.error("Cart is empty");
+      setCheckoutClicked(true);
+      setTimeout(() => {
+        setCheckoutClicked(false);
+      }, 1000);
+      return;
+    }
     if (selectedPayment === "paypal" && address !== null) {
       try {
         const products = cartProducts.map((item) => ({
