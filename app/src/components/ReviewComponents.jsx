@@ -218,7 +218,7 @@ const ReviewComponents = ({ productId, averageRating, setUpdate, update }) => {
           <AddReviewContainer>
             <HeadingContainer>Add your rating:</HeadingContainer>
             <RatingReview>
-              <div>{renderStars()}</div>
+              <div className="flex">{renderStars()}</div>
               <ReviewTextArea
                 placeholder="Write your review..."
                 value={review}

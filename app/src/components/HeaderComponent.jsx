@@ -99,6 +99,7 @@ const Dropdown = styled.div`
   background-color: white;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
+  z-index: 111;
   padding: 10px;
   display: ${({ isOpen }) => (isOpen ? "block" : "none")};
 `;
@@ -120,7 +121,7 @@ const HeaderComponent = () => {
   const currentUser = useSelector((state) => state.user.currentUser);
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (!menus.current.contains(event.target)) {
+      if (!menus?.current?.contains(event?.target)) {
         setShowSidebar(false);
       }
     };

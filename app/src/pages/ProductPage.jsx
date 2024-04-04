@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import { Container } from "react-bootstrap";
 import { styled } from "styled-components";
-import HeaderComponent from "../components/HeaderComponent";
-import Announcement from "../components/Announcement";
-import { BsFillBagPlusFill } from "react-icons/bs";
-import { addCartProduct } from "../redux/cartRedux";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { publicRequest } from "../requestMethod";
-import { FiArrowRight } from "react-icons/fi";
-import ReviewComponents from "../components/ReviewComponents";
 import Swal from "sweetalert2";
-import ProductPageSkeleton from "../components/SkeletonsComponents/ProductPageSkeleton";
-import LoadingClip from "../components/Loadings/LoadingClip";
+import { addCartProduct } from "../redux/cartRedux";
+import { BsFillBagPlusFill } from "react-icons/bs";
+import { FiArrowRight } from "react-icons/fi";
 
+const HeaderComponent = lazy(() => import("../components/HeaderComponent"));
+const Announcement = lazy(() => import("../components/Announcement"));
+const ProductPageSkeleton = lazy(() => import("../components/SkeletonsComponents/ProductPageSkeleton"));
+const ReviewComponents = lazy(() => import("../components/ReviewComponents"));
+const LoadingClip = lazy(() => import("../components/Loadings/LoadingClip"));
 const Wrapper = styled.div`
   display: flex;
 `;
@@ -266,7 +266,8 @@ const ProductPage = () => {
   };
 
   return (
-    <>
+    
+    <Suspense fallback={<div>Loading....</div>}>
       <Announcement />
       <HeaderComponent />
 
@@ -360,7 +361,7 @@ const ProductPage = () => {
           </Wrapper>
         </Container>
       )}
-    </>
+    </Suspense>
   );
 };
 

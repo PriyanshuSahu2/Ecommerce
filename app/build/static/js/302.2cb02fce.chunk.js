@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkfrontend=self.webpackChunkfrontend||[]).push([[302],{1302:function(n,e,t){t.r(e);var r,i=t(168),o=t(6487),c=t(184),s=o.ZP.div(r||(r=(0,i.Z)(["\n    height: 30px;\n    background-color:  #FF3E6C;\n    color: white;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 14px;\n    font-weight: 500;\n"])));e.default=function(){return(0,c.jsx)(s,{children:"Super Deal! Free shipping on Orders Over $499"})}}}]);
+//# sourceMappingURL=302.2cb02fce.chunk.js.map
