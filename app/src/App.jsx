@@ -1,17 +1,20 @@
 import React, { Suspense, lazy, useEffect, useState } from "react";
 
 
+
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
+  useLocation
 } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import FooterComponent from "./components/FooterComponent";
 import { styled } from "styled-components";
+import Layout from "./pages/Layout";
 
 const Home = lazy(() => import("./pages/Home"));
 const ProductsPage = lazy(() => import("./pages/ProductsPage"));
@@ -26,7 +29,6 @@ const UserProfile = lazy(() => import("./pages/UserProfile"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const OrderHistoryPage = lazy(() => import("./pages/OrderHistoryPage"));
-
 const Wrapper = styled.div`
   font-family: "Assistant", sans-serif;
   height: 100vh;
@@ -39,7 +41,7 @@ const App = () => {
   const user = useSelector((state) => state.user.currentUser);
 
   useEffect(() => {
-    setLoading(false); // Set loading to false once user state is determined
+    setLoading(false);
   }, [user]);
 
   if (loading) {
@@ -52,6 +54,7 @@ const App = () => {
       <Wrapper>
         <Router>
           <Suspense fallback={<div>Loading...</div>}>
+
             <Routes>
               {/* Routes for authenticated users */}
               {user && (
@@ -79,6 +82,7 @@ const App = () => {
                 element={user ? <Navigate to="/" /> : <AuthPage />}
               ></Route>
             </Routes>
+
           </Suspense>
         </Router>
         <FooterComponent />

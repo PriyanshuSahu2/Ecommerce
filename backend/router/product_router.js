@@ -78,7 +78,7 @@ router.get("/top", async (req, res) => {
         },
       },
       {
-        $limit: 10, // Get only the top 5 products
+        $limit: 5, // Get only the top 5 products
       },
     ]);
     const result = await Order.populate(salesByProducts, [
